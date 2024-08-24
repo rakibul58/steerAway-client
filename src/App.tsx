@@ -1,12 +1,10 @@
-import { ModeToggle } from "./components/theme/mode-toggle";
-import { Button } from "./components/ui/button";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./routes/router";
 
 function App() {
   return (
     <>
-      <h1 className="text-3xl">Hello World</h1>
-      <Button>Click Me</Button>
-      <ModeToggle />
+      <RouterProvider router={router} ></RouterProvider>
     </>
   );
 }
