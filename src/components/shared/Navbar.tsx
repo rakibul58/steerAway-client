@@ -23,6 +23,7 @@ const Navbar = () => {
             />
           </NavLink>
         </div>
+        {/* navlinks for big devices */}
         <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
           <NavLink
             to="/"
@@ -57,6 +58,7 @@ const Navbar = () => {
             Contact
           </NavLink>
         </nav>
+        {/* navlinks for small devices */}
         <Sheet>
           <SheetTrigger asChild>
             <Button
