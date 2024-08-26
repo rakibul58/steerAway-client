@@ -18,6 +18,7 @@ const SignIn = () => {
 
   const [login] = useLoginMutation();
 
+  // handling login user
   const handleLogin: SubmitHandler<TLoginUser> = async (data: TLoginUser) => {
     const toastId = toast.loading("Logging in");
     try {
@@ -26,7 +27,6 @@ const SignIn = () => {
       console.log({ res });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      // console.log({err});
       toast.error(err.data.message || "Something went wrong", {
         id: toastId,
         duration: 2000,
