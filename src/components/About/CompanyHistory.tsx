@@ -2,7 +2,7 @@ const CompanyHistory = () => {
   return (
     <section className="py-16">
       <div className="">
-        <div className="grid gap-4 mx-4 sm:grid-cols-12">
+        <div className="grid gap-4 px-2 sm:grid-cols-12">
           <div className="col-span-12 sm:col-span-3">
             <div className="text-center sm:text-left mb-14 before:block before:w-24 before:h-3 before:mb-5 before:rounded-md before:mx-auto sm:before:mx-0 before:dark:bg-primary before:bg-primary">
               <h3 className="text-4xl font-bold">Our Journey</h3>

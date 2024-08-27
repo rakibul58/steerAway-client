@@ -4,9 +4,9 @@ import { TMember } from "@/Types/About";
 const MeetTheTeam = () => {
   return (
     <section className="py-16">
-      <div className="container p-4 mx-auto space-y-16 sm:p-10">
+      <div className="p-2 mx-auto space-y-16">
         <div className="space-y-4">
-          <h3 className="text-2xl font-bold leadi sm:text-5xl">
+          <h3 className="text-4xl font-bold leadi sm:text-4xl">
             Meet Our Dream Team
           </h3>
           <p className="max-w-2xl text-foreground">
@@ -21,7 +21,7 @@ const MeetTheTeam = () => {
             <div key={member.name} className="space-y-4">
               <img
                 alt=""
-                className="object-cover h-56 mx-auto mb-4 bg-center rounded-sm bg-gray-500"
+                className="object-cover h-56 mx-auto mb-4 bg-center rounded-sm bg-gray-500 w-full"
                 src={member.imageUrl}
               />
               <div className="flex flex-col items-center">
