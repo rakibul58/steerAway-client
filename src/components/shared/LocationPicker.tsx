@@ -33,7 +33,10 @@ export function LocationPicker({ value, setValue }: LocationValueProps) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="md:w-[280px] w-full justify-between"
+          className={cn(
+            "md:w-[280px] w-full justify-between",
+            !value && "text-muted-foreground"
+          )}
         >
           {value
             ? bangladeshiLocations.find((location) => location.value === value)
