@@ -4,3 +4,10 @@ export type TSellingPoints = {
   title: string;
   description: string;
 };
+
+export type TReview = {
+  id: number;
+  name: string;
+  rating: number;
+  comment: string;
+};

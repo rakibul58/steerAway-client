@@ -28,7 +28,6 @@ const featuredCars = [
     price: '৳12,000/day',
     imageUrl: img3
   },
-  // Add more cars as needed
 ];
 
 const Featured = () => {
@@ -60,8 +59,8 @@ const Featured = () => {
     <section className="py-16">
       <div className="container mx-auto px-4">
         {/* Title and Subtitle */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-primary">Featured Cars</h2>
+        <div className="mb-12">
+          <h2 className="text-4xl font-bold">Featured Cars</h2>
           <p className="text-lg text-foreground mt-4">
             Explore our range of top-rated vehicles, ready for your next adventure.
           </p>
