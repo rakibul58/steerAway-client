@@ -1,7 +1,13 @@
+import CompanyHistory from "@/components/About/CompanyHistory";
+import Header from "@/components/About/Header";
+import MeetTheTeam from "@/components/About/MeetTheTeam";
+
 const About = () => {
   return (
     <div>
-      <h1>This is About Component</h1>
+      <Header />
+      <CompanyHistory />
+      <MeetTheTeam />
     </div>
   );
 };
