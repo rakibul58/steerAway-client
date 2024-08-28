@@ -2,13 +2,18 @@ import loginImg from "@/assets/loginImg (2).jpg";
 import logo from "@/assets/steer-away-high-resolution-logo-transparent.png";
 import { Button } from "@/components/ui/button";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
+import { setUser, TUser } from "@/redux/features/auth/authSlice";
+import { useAppDispatch } from "@/redux/hook";
 import { TLoginUser } from "@/Types/LoginUserInfo";
+import { verifyToken } from "@/utils/verifyToken";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const SignIn = () => {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [isHidden, setIsHidden] = useState(true);
   const {
     register,
@@ -17,14 +22,18 @@ const SignIn = () => {
   } = useForm<TLoginUser>();
 
   const [login] = useLoginMutation();
+  const location = useLocation();
+  const from = location.state?.from?.pathname;
 
   // handling login user
   const handleLogin: SubmitHandler<TLoginUser> = async (data: TLoginUser) => {
     const toastId = toast.loading("Logging in");
     try {
       const res = await login(data).unwrap();
+      const user = verifyToken(res.data.token) as TUser;
+      dispatch(setUser({ user: user, token: res.data.token }));
       toast.success(res.message, { id: toastId, duration: 2000 });
-      console.log({ res });
+      navigate(from || `/${user.role}/overview`, { replace: true });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(err.data.message || "Something went wrong", {
@@ -95,6 +104,7 @@ const SignIn = () => {
 
                 <input
                   id="email"
+                  placeholder="xyz@gmail.com"
                   {...register("email", {
                     required: "Email is required",
                     pattern: {
@@ -118,6 +128,7 @@ const SignIn = () => {
 
                 <div className="flex items-center py-3 px-2 w-full rounded-sm bg-secondary shadow-md mb-2">
                   <input
+                    placeholder="password"
                     type={isHidden ? "password" : "text"}
                     id="password"
                     {...register("password", {

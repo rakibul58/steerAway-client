@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import SkeletonCard from "../shared/SkeletonCard";
 import NoDataFound from "../shared/NoDataFound";
 import ProductCard from "../shared/ProductCard";
+import { useEffect } from "react";
 
 const Featured = () => {
   const settings = {
@@ -41,12 +42,14 @@ const Featured = () => {
     isLoading,
   } = useGetAllCarsQuery([{ name: "status", value: "available" }]);
 
-  if (isFetching || isLoading) {
-    toast.loading("Fetching Cars");
-  } else {
-    toast.dismiss();
-    toast.success("Cars Fetched Successfully", { duration: 1000 });
-  }
+  useEffect(() => {
+    if (isFetching || isLoading) {
+      toast.loading("Fetching Cars");
+    } else {
+      toast.dismiss();
+      toast.success("Cars Fetched Successfully", { duration: 1000 });
+    }
+  }, [isFetching, isLoading]);
 
   return (
     <section className="py-16">

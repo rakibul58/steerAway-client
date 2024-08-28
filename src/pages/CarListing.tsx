@@ -9,7 +9,7 @@ import SkeletonCard from "@/components/shared/SkeletonCard";
 import { Button } from "@/components/ui/button";
 import { useGetAllCarsQuery } from "@/redux/features/cars/carApi";
 import { TCar } from "@/Types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const CarListing = () => {
@@ -36,12 +36,14 @@ const CarListing = () => {
     { name: "features", value: feature },
   ]);
 
-  if (isFetching || isLoading) {
-    toast.loading("Fetching Cars");
-  } else {
-    toast.dismiss();
-    toast.success("Cars Fetched Successfully", { duration: 1000 });
-  }
+  useEffect(() => {
+    if (isFetching || isLoading) {
+      toast.loading("Fetching Cars");
+    } else {
+      toast.dismiss();
+      toast.success("Cars Fetched Successfully", { duration: 1000 });
+    }
+  }, [isFetching, isLoading]);
 
   const handleReset = () => {
     setCarType(null);
