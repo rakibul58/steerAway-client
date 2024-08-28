@@ -4,6 +4,7 @@ import img from "@/assets/headerImg3.jpg";
 import { FormEvent, useState } from "react";
 import { DatePicker } from "../shared/DatePicker";
 import { LocationPicker } from "../shared/LocationPicker";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const [date, setDate] = useState<Date>();
@@ -29,7 +30,9 @@ const Header = () => {
           <h2 className="text-xl text-gray-200 mb-8">
             Discover the freedom of the open road with our top-rated vehicles.
           </h2>
-          <Button className="px-6 py-3 text-lg rounded mb-8">Book Now</Button>
+          <Link to={"/car-listings"}>
+            <Button className="px-6 py-3 text-lg rounded mb-8">Book Now</Button>
+          </Link>
           <form
             className="px-2 md:px-0 flex flex-col sm:flex-row gap-4 justify-center"
             onSubmit={handleSubmit}
@@ -42,9 +45,16 @@ const Header = () => {
               <DatePicker date={date} setDate={setDate} />
             </div>
 
-            <Button type="submit" variant={"outline"} className="text-primary">
-              Search
-            </Button>
+            <Link to={"/car-listings"}>
+              {" "}
+              <Button
+                type="submit"
+                variant={"outline"}
+                className="text-primary"
+              >
+                Search
+              </Button>
+            </Link>
           </form>
         </div>
       </div>
