@@ -8,7 +8,7 @@ import { TLoginUser } from "@/Types/LoginUserInfo";
 import { verifyToken } from "@/utils/verifyToken";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const SignIn = () => {
@@ -22,8 +22,6 @@ const SignIn = () => {
   } = useForm<TLoginUser>();
 
   const [login] = useLoginMutation();
-  const location = useLocation();
-  const from = location.state?.from?.pathname;
 
   // handling login user
   const handleLogin: SubmitHandler<TLoginUser> = async (data: TLoginUser) => {
@@ -33,7 +31,7 @@ const SignIn = () => {
       const user = verifyToken(res.data.token) as TUser;
       dispatch(setUser({ user: user, token: res.data.token }));
       toast.success(res.message, { id: toastId, duration: 2000 });
-      navigate(from || `/${user.role}/overview`, { replace: true });
+      navigate(`/${user.role}/overview`);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(err.data.message || "Something went wrong", {

@@ -40,7 +40,10 @@ const Featured = () => {
     data: cars,
     isFetching,
     isLoading,
-  } = useGetAllCarsQuery([{ name: "status", value: "available" }]);
+  } = useGetAllCarsQuery([
+    { name: "status", value: "available" },
+    { name: "limit", value: "5" },
+  ]);
 
   useEffect(() => {
     if (isFetching || isLoading) {

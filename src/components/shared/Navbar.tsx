@@ -52,12 +52,12 @@ const Navbar = () => {
             About
           </NavLink>
           <NavLink
-            to="/booking"
+            to="/car-listings"
             className={({ isActive }) =>
               isActive ? activeClasses : inActiveClasses
             }
           >
-            Booking
+            Listings
           </NavLink>
           <NavLink
             to="/contact"
@@ -113,12 +113,12 @@ const Navbar = () => {
                 About
               </NavLink>
               <NavLink
-                to="/booking"
+                to="/car-listings"
                 className={({ isActive }) =>
                   isActive ? activeClasses : inActiveClasses
                 }
               >
-                Booking
+                Listings
               </NavLink>
               <NavLink
                 to="/contact"
