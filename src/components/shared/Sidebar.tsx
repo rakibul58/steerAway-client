@@ -44,8 +44,8 @@ const Sidebar = () => {
     "text-muted-foreground transition-colors text-lg hover:bg-orange-100 dark:hover:bg-orange-900 border w-full pl-4 py-3 rounded border-primary";
 
   return (
-    <div className="sticky top-0 flex flex-col justify-center bg-background z-50">
-      <header className="flex flex-row md:flex-col md:items-center gap-4 md:border-r bg-background py-8 px-2 min-h-screen">
+    <div className="sticky top-0 flex flex-col justify-center bg-background z-50 w-full md:w-[270px]">
+      <header className="flex flex-row md:flex-col md:items-center gap-4 md:border-r bg-background py-4 md:py-8 px-2 md:min-h-screen">
         <div className="hidden md:flex flex-col items-center gap-8">
           <NavLink to="/" className="">
             <img
@@ -111,9 +111,6 @@ const Sidebar = () => {
                 />
                 <ModeToggle />
               </div>
-              {/* <div className="flex justify-center">
-                <ModeToggle />
-              </div> */}
               <NavLink
                 to="/"
                 className={({ isActive }) =>
@@ -122,30 +119,26 @@ const Sidebar = () => {
               >
                 Home
               </NavLink>
-              <NavLink
-                to="/about"
-                className={({ isActive }) =>
-                  isActive ? activeClasses : inActiveClasses
-                }
+              {routes.map(
+                (route) =>
+                  route.path !== "" && (
+                    <NavLink
+                      key={route.name}
+                      to={route.path}
+                      className={({ isActive }) =>
+                        isActive ? activeClasses : inActiveClasses
+                      }
+                    >
+                      {route.name}
+                    </NavLink>
+                  )
+              )}
+              <Button
+                className="w-full text-lg py-6"
+                onClick={() => dispatch(logout())}
               >
-                About
-              </NavLink>
-              <NavLink
-                to="/car-listings"
-                className={({ isActive }) =>
-                  isActive ? activeClasses : inActiveClasses
-                }
-              >
-                Listing
-              </NavLink>
-              <NavLink
-                to="/contact"
-                className={({ isActive }) =>
-                  isActive ? activeClasses : inActiveClasses
-                }
-              >
-                Contact
-              </NavLink>
+                Logout
+              </Button>
             </nav>
           </SheetContent>
         </Sheet>
