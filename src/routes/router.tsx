@@ -11,6 +11,7 @@ import { adminRoutes } from "./admin.route";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { userRoutes } from "./user.route";
 import ProtectedRoute from "@/components/layout/ProtectedRoute";
+import CarDetails from "@/pages/CarDetails";
 
 export const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ export const router = createBrowserRouter([
       {
         path: "car-listings",
         element: <CarListing />,
+      },
+      {
+        path: "car-details/:id",
+        element: <CarDetails />,
       },
       {
         path: "contact",

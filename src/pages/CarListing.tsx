@@ -1,5 +1,6 @@
 import FilterByCarType from "@/components/CarListing/FilterByCarType";
 import FilterByPrice from "@/components/CarListing/FilterByPrice";
+import FilterByStatus from "@/components/CarListing/FilterByStatus";
 import FilterByFeatures from "@/components/CarListing/FiterByFeatures";
 import SortPrice from "@/components/CarListing/SortPrice";
 import NoDataFound from "@/components/shared/NoDataFound";
@@ -19,6 +20,11 @@ const CarListing = () => {
   const [sort, setSort] = useState<string | null>(null);
   const [carType, setCarType] = useState<string | null>(null);
   const [feature, setFeature] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [page]);
 
   const {
     data: cars,
@@ -27,13 +33,13 @@ const CarListing = () => {
     error,
   } = useGetAllCarsQuery([
     { name: "limit", value: "6" },
-    { name: "status", value: "available" },
     { name: "page", value: page },
     { name: "maxPrice", value: maxPrice },
     { name: "minPrice", value: minPrice },
     { name: "sort", value: sort },
     { name: "carType", value: carType },
     { name: "features", value: feature },
+    { name: "status", value: status },
   ]);
 
   useEffect(() => {
@@ -49,21 +55,17 @@ const CarListing = () => {
     setCarType(null);
     setSort(null);
     setFeature(null);
-    // setSearchTerm("");
     setMaxPrice(null);
     setMinPrice(null);
+    setStatus(null);
   };
 
   return (
     <div className="py-8 px-2 grid grid-cols-1 gap-5">
       <div className="w-full flex flex-col md:flex-row gap-4 p-4">
-        {/* <SearchComponent
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-        />
-       */}
         <FilterByFeatures feature={feature} setFeature={setFeature} />
         <FilterByCarType carType={carType} setCarType={setCarType} />
+        <FilterByStatus status={status} setStatus={setStatus} />
         <FilterByPrice
           maxPrice={maxPrice}
           minPrice={minPrice}
