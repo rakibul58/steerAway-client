@@ -12,6 +12,8 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import { userRoutes } from "./user.route";
 import ProtectedRoute from "@/components/layout/ProtectedRoute";
 import CarDetails from "@/pages/CarDetails";
+import Booking from "@/pages/Booking";
+import BookingConfirmation from "@/pages/BookingConfirmation";
 
 export const router = createBrowserRouter([
   {
@@ -47,12 +49,20 @@ export const router = createBrowserRouter([
         path: "contact",
         element: <Contact />,
       },
+      {
+        path: "/booking/:id",
+        element: <ProtectedRoute roles={["user", "admin"]}><Booking /></ProtectedRoute>,
+      },
+      {
+        path: "/booking-confirmation/:id",
+        element: <ProtectedRoute roles={["user", "admin"]}><BookingConfirmation /></ProtectedRoute>,
+      },
     ],
   },
   {
     path: "/admin",
     element: (
-      <ProtectedRoute role="admin">
+      <ProtectedRoute roles={["admin"]}>
         <DashboardLayout />
       </ProtectedRoute>
     ),
@@ -62,7 +72,7 @@ export const router = createBrowserRouter([
   {
     path: "/user",
     element: (
-      <ProtectedRoute role="user">
+      <ProtectedRoute roles={["user"]}>
         <DashboardLayout />
       </ProtectedRoute>
     ),

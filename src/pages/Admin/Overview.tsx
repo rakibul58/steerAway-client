@@ -31,8 +31,8 @@ const Overview = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatCard title="Total Bookings" value={data.totalBookings} />
         <StatCard title="Available Cars" value={data.availableCars} />
-        <StatCard title="Current Month Revenue" value={`$${data.revenue.currentMonth}`} />
-        <StatCard title="Total Revenue" value={`$${data.revenue.total}`} />
+        <StatCard title="Current Month Revenue" value={`৳${data.revenue.currentMonth}`} />
+        <StatCard title="Total Revenue" value={`৳${data.revenue.total}`} />
         <StatCard title="Active Reservations" value={data.activeReservations} />
         <StatCard title="Active Users" value={data.userActivity.activeUsers} />
       </div>

@@ -31,7 +31,18 @@ const SignIn = () => {
       const user = verifyToken(res.data.token) as TUser;
       dispatch(setUser({ user: user, token: res.data.token }));
       toast.success(res.message, { id: toastId, duration: 2000 });
-      navigate(`/${user.role}/overview`);
+      const navigateTo = localStorage.getItem("navigateTo");
+      if (navigateTo === "null") {
+        navigate(`/${user.role}/overview`);
+      } else {
+        // will navigate to booking page
+        localStorage.setItem("navigateTo", "null");
+        const state = JSON.parse(
+          localStorage.getItem("selectedFeatures") as string
+        );
+        localStorage.setItem("selectedFeatures", "null");
+        navigate(navigateTo as string, { state });
+      }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(err.data.message || "Something went wrong", {

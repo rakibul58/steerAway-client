@@ -13,7 +13,7 @@ const ProductCard = ({ _id, name, image, description, pricePerHour }: TCar) => {
             {description.slice(0, 15) + "..."}
           </p>
           <div className="flex items-center justify-between">
-            <p className="text-orange-500 font-bold">${pricePerHour}/Hour</p>
+            <p className="text-orange-500 font-bold">৳{pricePerHour}/Hour</p>
             <Link to={`/car-details/${_id}`}>
               <Button size={"sm"}>Details</Button>
             </Link>

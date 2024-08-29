@@ -1,15 +1,27 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useGetSingleCarQuery } from "@/redux/features/cars/carApi";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
 import { Button } from "@/components/ui/button";
-import { AdditionalFeatures } from "@/Constants/Car";
 
 const CarDetails = () => {
   const { id } = useParams();
   const { data, isFetching, isLoading } = useGetSingleCarQuery(id as string);
+  const [selectedFeatures, setSelectedFeatures] = useState({
+    insurance: false,
+    gps: false,
+    childSeat: false,
+  });
+
+  const handleFeatureToggle = (feature: string) => {
+    setSelectedFeatures((prevState: any) => ({
+      ...prevState,
+      [feature]: !prevState[feature],
+    }));
+  };
 
   useEffect(() => {
     if (isFetching || isLoading) {
@@ -27,7 +39,7 @@ const CarDetails = () => {
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">{data?.data?.name}</h1>
           <p className="text-xl font-semibold text-primary">
-            ${data?.data?.pricePerHour}/Hour
+            ৳{data?.data?.pricePerHour}/Hour
           </p>
         </div>
 
@@ -65,16 +77,53 @@ const CarDetails = () => {
               <h2 className="text-2xl font-semibold mt-6">
                 Additional Options
               </h2>
-              <ul className="list-disc list-inside">
-                {AdditionalFeatures?.slice(0, 5)?.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
+              <div className="space-y-2">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={selectedFeatures.insurance}
+                    onChange={() => handleFeatureToggle("insurance")}
+                    className="mr-2"
+                  />
+                  <span>Insurance (+৳{data?.data?.insurancePrice})</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={selectedFeatures.gps}
+                    onChange={() => handleFeatureToggle("gps")}
+                    className="mr-2"
+                  />
+                  <span>GPS (+৳{data?.data?.gpsPrice})</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={selectedFeatures.childSeat}
+                    onChange={() => handleFeatureToggle("childSeat")}
+                    className="mr-2"
+                  />
+                  <span>Child Seat (+৳{data?.data?.childSeatPrice})</span>
+                </label>
+              </div>
             </div>
 
             {/* Book Now Button */}
             <div className="mt-12">
-              <Link to={`/booking/${data?.data?._id}`}>
+              <Link
+                onClick={() => {
+                  localStorage.setItem(
+                    "navigateTo",
+                    `/booking/${data?.data?._id}`
+                  );
+                  localStorage.setItem(
+                    "selectedFeatures",
+                    JSON.stringify(selectedFeatures)
+                  );
+                }}
+                to={`/booking/${data?.data?._id}`}
+                state={selectedFeatures}
+              >
                 {" "}
                 <Button size="lg" className="w-full">
                   Book Now
@@ -89,7 +138,7 @@ const CarDetails = () => {
                 {/* {data?.data?.reviews?.map((review: Record<string,string | number>, index: string) => ( */}
                 <div
                   // key={index}
-                  className="p-4 rounded-lg shadow-md"
+                  className="p-4 rounded-lg shadow-lg border"
                 >
                   <div className="flex justify-between items-center">
                     {/* <p className="font-bold">{review.name}</p> */}
