@@ -25,7 +25,7 @@ const SignIn = () => {
 
   // handling login user
   const handleLogin: SubmitHandler<TLoginUser> = async (data: TLoginUser) => {
-    const toastId = toast.loading("Logging in");
+    const toastId = toast.loading("Logging in", { duration: 3000 });
     try {
       const res = await login(data).unwrap();
       const user = verifyToken(res.data.token) as TUser;

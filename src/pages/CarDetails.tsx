@@ -25,7 +25,7 @@ const CarDetails = () => {
 
   useEffect(() => {
     if (isFetching || isLoading) {
-      toast.loading("Fetching Car Details");
+      toast.loading("Fetching Car Details", { duration: 3000 });
     } else {
       toast.dismiss();
       toast.success("Car Details Fetched Successfully", { duration: 1000 });
@@ -143,7 +143,9 @@ const CarDetails = () => {
                   </Button>
                 </Link>
               ) : (
-                <Button size="lg" className="w-full" disabled>Book Now</Button>
+                <Button size="lg" className="w-full" disabled>
+                  Book Now
+                </Button>
               )}
             </div>
 

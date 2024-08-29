@@ -11,4 +11,9 @@ export const userRoutes = [
     name: "Overview",
     element: <Overview />,
   },
+  {
+    path: "booking-management",
+    name: "Booking Management",
+    element: <Overview />,
+  },
 ];

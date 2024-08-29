@@ -39,7 +39,7 @@ const Overview = () => {
   } = useForm<IProfileForm>();
 
   const onSubmit: SubmitHandler<IProfileForm> = async (data) => {
-    const toastId = toast.loading("Profile Updating...");
+    const toastId = toast.loading("Profile Updating...", {duration: 3000});
     try {
       const res = await updateProfile(data).unwrap();
       toast.success(res.message, { id: toastId, duration: 2000 });
@@ -53,8 +53,8 @@ const Overview = () => {
   };
 
   return (
-    <section className="py-16">
-      <div className="container mx-auto px-6 lg:px-12">
+    <section className="">
+      <div className="px-6">
         <h1 className="text-3xl font-bold mb-8">User Dashboard</h1>
 
         {/* Profile Overview Section */}

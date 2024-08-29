@@ -47,7 +47,7 @@ const Featured = () => {
 
   useEffect(() => {
     if (isFetching || isLoading) {
-      toast.loading("Fetching Cars");
+      toast.loading("Fetching Cars", {duration: 3000});
     } else {
       toast.dismiss();
       toast.success("Cars Fetched Successfully", { duration: 1000 });

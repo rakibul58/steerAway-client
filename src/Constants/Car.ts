@@ -1,23 +1,15 @@
 export const CarTypes = [
   "SUV",
   "Sedan",
-  "Hatchback",
-  "Convertible",
-  "Coupe",
   "Hybrid",
   "Electric",
   "Truck",
   "Van",
   "Wagon",
-  "Crossover",
-  "Diesel",
   "Luxury",
   "Sports Car",
   "Minivan",
-  "Off-Road",
-  "Compact",
   "Pickup",
-  "Roadster",
   "Microcar",
 ];
 

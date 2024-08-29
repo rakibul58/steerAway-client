@@ -37,7 +37,7 @@ const SignUp = () => {
       return toast.error("You must accept the Terms & Conditions.");
     }
 
-    const toastId = toast.loading("Signing up...");
+    const toastId = toast.loading("Signing up...", { duration: 3000 });
     try {
       const res = await signUp({
         name: data.name,

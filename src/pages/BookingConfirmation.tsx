@@ -16,7 +16,7 @@ const BookingConfirmation = () => {
   }
 
   const handleConfirmBooking = async () => {
-    const toastId = toast.loading("Booking...");
+    const toastId = toast.loading("Booking...", {duration: 3000});
     try {
       const res = await bookCar(bookingDetails).unwrap();
       toast.success(res.message, { id: toastId, duration: 2000 });
