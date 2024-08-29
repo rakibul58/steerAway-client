@@ -6,7 +6,6 @@ const carApi = baseApi.injectEndpoints({
     getAllCars: builder.query({
       query: (args) => {
         const params = new URLSearchParams();
-        console.log({ args });
         if (args) {
           args.forEach((item: TQueryParam) => {
             if (item.value !== null)
@@ -27,6 +26,7 @@ const carApi = baseApi.injectEndpoints({
         url: `/cars/${id}`,
         method: "GET",
       }),
+      providesTags: ["cars"],
     }),
   }),
 });

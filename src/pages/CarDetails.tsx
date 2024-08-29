@@ -66,6 +66,18 @@ const CarDetails = () => {
           {/* Car Details and Features */}
           <div className="lg:w-1/2">
             <div className="space-y-4">
+              <h2 className="text-2xl font-semibold">Description</h2>
+              <div className="list-disc list-inside">
+                {data?.data?.description}
+              </div>
+              <h2 className="text-2xl font-semibold">Status</h2>
+              <div className="font-bold">
+                {data?.data?.status === "available" ? (
+                  <div className="text-green-400">Available</div>
+                ) : (
+                  <div className="text-red-400">Unavailable</div>
+                )}
+              </div>
               <h2 className="text-2xl font-semibold">Features</h2>
               <ul className="list-disc list-inside">
                 {data?.data?.features.map(
@@ -110,25 +122,29 @@ const CarDetails = () => {
 
             {/* Book Now Button */}
             <div className="mt-12">
-              <Link
-                onClick={() => {
-                  localStorage.setItem(
-                    "navigateTo",
-                    `/booking/${data?.data?._id}`
-                  );
-                  localStorage.setItem(
-                    "selectedFeatures",
-                    JSON.stringify(selectedFeatures)
-                  );
-                }}
-                to={`/booking/${data?.data?._id}`}
-                state={selectedFeatures}
-              >
-                {" "}
-                <Button size="lg" className="w-full">
-                  Book Now
-                </Button>
-              </Link>
+              {data?.data?.status === "available" ? (
+                <Link
+                  onClick={() => {
+                    localStorage.setItem(
+                      "navigateTo",
+                      `/booking/${data?.data?._id}`
+                    );
+                    localStorage.setItem(
+                      "selectedFeatures",
+                      JSON.stringify(selectedFeatures)
+                    );
+                  }}
+                  to={`/booking/${data?.data?._id}`}
+                  state={selectedFeatures}
+                >
+                  {" "}
+                  <Button size="lg" className="w-full">
+                    Book Now
+                  </Button>
+                </Link>
+              ) : (
+                <Button size="lg" className="w-full" disabled>Book Now</Button>
+              )}
             </div>
 
             {/* Customer Reviews */}
