@@ -121,7 +121,7 @@ const Sidebar = () => {
               </NavLink>
               {routes.map(
                 (route, index) =>
-                  route.path !== "" && (
+                  route.name && (
                     <NavLink
                       key={index}
                       to={route.path}

@@ -1,5 +1,6 @@
 import AddCars from "@/pages/Admin/AddCars";
 import EditCars from "@/pages/Admin/EditCars";
+import ManageBookings from "@/pages/Admin/ManageBookings";
 import ManageCars from "@/pages/Admin/ManageCars";
 import Overview from "@/pages/Admin/Overview";
 
@@ -26,5 +27,10 @@ export const adminRoutes = [
   {
     path: "edit-car/:id",
     element: <EditCars />,
+  },
+  {
+    path: "manage-bookings",
+    name: "Manage Bookings",
+    element: <ManageBookings />,
   },
 ];

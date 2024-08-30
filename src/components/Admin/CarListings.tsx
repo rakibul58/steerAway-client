@@ -29,6 +29,7 @@ const CarListings = ({
               <th className="px-4 py-2 text-left">Name/Model</th>
               <th className="px-4 py-2 text-left">Year</th>
               <th className="px-4 py-2 text-left">Color</th>
+              <th className="px-4 py-2 text-left">Status</th>
               <th className="px-4 py-2 text-left">Price Per Hour</th>
               <th className="px-4 py-2 text-left">Car Type</th>
               <th className="px-4 py-2 text-left">Actions</th>
@@ -48,6 +49,17 @@ const CarListings = ({
                   <td className="px-4 py-2">{car.name}</td>
                   <td className="px-4 py-2">{car.year || "N/A"}</td>
                   <td className="px-4 py-2">{car.color || "N/A"}</td>
+                  <td className="px-4 py-2">
+                    <div
+                      className={`inline-block px-2 py-1 text-sm rounded ${
+                        car.status === "available"
+                          ? "bg-green-200 text-green-800"
+                          : "bg-red-200 text-red-800"
+                      }`}
+                    >
+                      {car.status?.charAt(0).toLocaleUpperCase()}{car.status?.slice(1)}
+                    </div>
+                  </td>
                   <td className="px-4 py-2">৳{car.pricePerHour || "N/A"}</td>
                   <td className="px-4 py-2">{car.carType || "N/A"}</td>
                   <td className="px-4 py-2 space-x-0 lg:space-x-2 space-y-2">

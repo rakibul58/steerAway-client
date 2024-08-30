@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { useGetAllCarsQuery } from "@/redux/features/cars/carApi";
+import {
+  useDeleteCarMutation,
+  useGetAllCarsQuery,
+} from "@/redux/features/cars/carApi";
 import CarListings from "@/components/Admin/CarListings";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
@@ -20,6 +23,7 @@ export interface ICarForm {
   insurancePrice?: number;
   childSeatPrice?: number;
   gpsPrice?: number;
+  status?: string;
 }
 
 const ManageCars = () => {
@@ -38,6 +42,7 @@ const ManageCars = () => {
       value: 5,
     },
   ]);
+  const [deleteCar] = useDeleteCarMutation();
 
   useEffect(() => {
     if (isFetching || isLoading) {
@@ -48,14 +53,19 @@ const ManageCars = () => {
     }
   }, [isFetching, isLoading]);
 
-  const handleDelete = async (carName: string) => {
-    console.log({carName});
-    // try {
-    //   await axios.delete(`/api/cars/${carName}`);
-    //   setCars((prev) => prev.filter((car) => car.name !== carName));
-    // } catch (error) {
-    //   console.error("Error deleting car:", error);
-    // }
+  const handleDelete = async (id: string) => {
+    const toastId = toast.loading("Deleting Car....", { duration: 3000 });
+    try {
+      const res = await deleteCar(id).unwrap();
+      console.log({res});
+      toast.success(res.message, { id: toastId, duration: 2000 });
+    } catch (err: any) {
+      console.log({err});
+      toast.error(err.data.message || "Something went wrong", {
+        id: toastId,
+        duration: 2000,
+      });
+    }
   };
 
   return (
@@ -63,7 +73,9 @@ const ManageCars = () => {
       <div className="px-6">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Manage Cars</h1>
-          <Link to={'/admin/add-car'}><Button >Add New Car</Button></Link>
+          <Link to={"/admin/add-car"}>
+            <Button>Add New Car</Button>
+          </Link>
         </div>
 
         <CarListings

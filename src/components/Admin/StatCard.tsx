@@ -1,11 +1,12 @@
-import { Card } from "../ui/card";
+import { Card } from '../ui/card';
 
-type TStarCardProps = {
+// StatCard component remains the same
+type TStatCardProps = {
   title: string;
   value: string | number;
 };
 
-export const StatCard = ({ title, value }: TStarCardProps) => {
+export const StatCard = ({ title, value }: TStatCardProps) => {
   return (
     <Card className="p-4 border border-gray-200 rounded-lg shadow-sm">
       <h3 className="text-lg font-medium">{title}</h3>

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,8 +18,16 @@ interface IProfileForm {
 }
 
 const Overview = () => {
-  const { data: user } = useProfileQuery(undefined);
-  const { data: bookings } = useGetMyBookingsQuery([
+  const {
+    data: user,
+    isFetching: isProfileFetching,
+    isLoading: isProfileLoading,
+  } = useProfileQuery(undefined);
+  const {
+    data: bookings,
+    isFetching: isBookingFetching,
+    isLoading: isBookingLoading,
+  } = useGetMyBookingsQuery([
     {
       name: "sort",
       value: "-createdAt",
@@ -32,6 +40,25 @@ const Overview = () => {
   const [updateProfile] = useUpdateProfileMutation();
   const [isEditing, setIsEditing] = useState(false);
 
+  useEffect(() => {
+    if (
+      isProfileFetching ||
+      isProfileLoading ||
+      isBookingFetching ||
+      isBookingLoading
+    ) {
+      toast.loading("Fetching Dashboard", { duration: 3000 });
+    } else {
+      toast.dismiss();
+      toast.success("Dashboard Fetched Successfully", { duration: 1000 });
+    }
+  }, [
+    isProfileFetching,
+    isProfileLoading,
+    isBookingFetching,
+    isBookingLoading,
+  ]);
+
   const {
     register,
     handleSubmit,
@@ -39,7 +66,7 @@ const Overview = () => {
   } = useForm<IProfileForm>();
 
   const onSubmit: SubmitHandler<IProfileForm> = async (data) => {
-    const toastId = toast.loading("Profile Updating...", {duration: 3000});
+    const toastId = toast.loading("Profile Updating...", { duration: 3000 });
     try {
       const res = await updateProfile(data).unwrap();
       toast.success(res.message, { id: toastId, duration: 2000 });

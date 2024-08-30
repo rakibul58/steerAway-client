@@ -10,6 +10,7 @@ const bookingApi = baseApi.injectEndpoints({
         body: bookingDetails,
       }),
     }),
+
     getMyBookings: builder.query({
       query: (args) => {
         const params = new URLSearchParams();
@@ -20,8 +21,6 @@ const bookingApi = baseApi.injectEndpoints({
           });
         }
 
-        console.log({params});
-
         return {
           url: "/bookings/my-bookings",
           method: "GET",
@@ -30,7 +29,40 @@ const bookingApi = baseApi.injectEndpoints({
       },
       providesTags: ["bookings"],
     }),
+
+    getAllBookings: builder.query({
+      query: (args) => {
+        const params = new URLSearchParams();
+        if (args) {
+          args.forEach((item: TQueryParam) => {
+            if (item.value !== null)
+              params.append(item.name, item.value as string);
+          });
+        }
+
+        return {
+          url: "/bookings",
+          method: "GET",
+          params: params,
+        };
+      },
+      providesTags: ["bookings"],
+    }),
+
+    updateBookingStatus: builder.mutation({
+      query: (payload) => ({
+        url: `/bookings/${payload.id}`,
+        method: "PUT",
+        body: payload.data,
+      }),
+      invalidatesTags: ["bookings", "cars"],
+    }),
   }),
 });
 
-export const { useBookCarMutation, useGetMyBookingsQuery } = bookingApi;
+export const {
+  useBookCarMutation,
+  useGetMyBookingsQuery,
+  useGetAllBookingsQuery,
+  useUpdateBookingStatusMutation,
+} = bookingApi;
