@@ -2,7 +2,7 @@
 
 ## Car Rental Reservation System
 
-[Live URL](https://steer-away.vercel.app/)
+[Live URL](https://steer-away-rental.vercel.app/)
 
 ### Table of Contents
 
