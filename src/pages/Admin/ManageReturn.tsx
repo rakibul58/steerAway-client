@@ -92,6 +92,7 @@ const ManageReturn = () => {
                 <th className="px-4 py-2 text-left">Renting Cost</th>
                 <th className="px-4 py-2 text-left">Additional Cost</th>
                 <th className="px-4 py-2 text-left">Total Cost</th>
+                <th className="px-4 py-2 text-left">Payment Status</th>
                 <th className="px-4 py-2 text-left">Action</th>
               </tr>
             </thead>
@@ -125,6 +126,17 @@ const ManageReturn = () => {
                       <span>GPS: ৳{booking.gpsCost}</span>
                     </td>
                     <td className="px-4 py-2">৳{booking.totalCost}</td>
+                    <td className="px-4 py-2">
+                      <span
+                        className={`inline-block px-2 py-1 text-sm rounded ${
+                          booking.paymentStatus === "Pending"
+                            ? "bg-red-200 text-red-800"
+                            : "bg-green-200 text-green-800"
+                        }`}
+                      >
+                        {booking.paymentStatus}
+                      </span>
+                    </td>
                     <td className="px-4 py-2 space-x-2 space-y-2">
                       {booking.status === "Approved" && (
                         <>
