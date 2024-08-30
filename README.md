@@ -1,50 +1,109 @@
-# React + TypeScript + Vite
+# SteerAway
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Car Rental Reservation System
 
-Currently, two official plugins are available:
+[Live URL](https://steer-away.vercel.app/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Table of Contents
 
-## Expanding the ESLint configuration
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Usage Guide](#usage-guide)
+- [Usage](#usage)
+- [Credentials](#Credentials)
+- [Contact](#contact)
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Project Overview
 
-- Configure the top-level `parserOptions` property like this:
+SteerAway is a comprehensive car rental reservation system backend with features for booking and managing car rentals. Users can easily search for available cars, make booking, and admin can manage bookings and returns.
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Features
+
+- **User Authentication:** Secure sign-up and login functionality.
+- **Car Search and Filter:** Admin can filter bookings based on carId and date.
+- **Booking Management:** Users can view the cars, book it if available.
+- **Admin:** Manage cars, bookings.
+
+## Technologies Used
+
+- **Frontend:** Typescript, React
+- **Backend:** Typescript, Node.js, Express
+- **ODM:** Mongoose
+- **Database:** MongoDB
+- **Deployment:** Vercel
+
+## Usage Guide
+
+Follow the following instructions to run the application locally.
+
+### Step 1
+
+Open command prompt(`cmd`) in folder where you want to add the project.
+
+### Step 2
+
+Run the following command to clone the repository:
+
+```
+git clone https://github.com/rakibul58/steerAway-client-assignment-5
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### Step 3
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+Open the cloned folder or run the following in cmd:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
 ```
+cd steerAway-client-assignment-5
+```
+
+### Step 4
+
+In the cloned folder run the following command on cmd:
+
+```
+npm install
+```
+
+### Step 5
+
+On the root directory add a `.env` file and add your database url and other environment variables bellow:
+
+```
+VITE_SERVER_API=
+VITE_CLOUDINARY_URI=
+VITE_CLOUDINARY_PRESET=
+```
+
+### Step 6
+
+Run the following code to start the development server:
+
+```
+npm run start
+```
+
+Other commands can be found in package.json scripts
+
+## Usage
+
+Once the application is set up and running, you can access it at http://localhost:5000 (or the appropriate port if specified differently). From there, you can create an account, log in, and start booking cars.
+
+## Credentials
+
+### Admin Credentials
+
+- **Email:** admin@test.com
+- **Password:** admin123
+
+### User Credentials
+
+- **Email:** user@test.com
+- **Password:** user123
+
+## Contact
+
+For any questions or feedback, please contact:
+
+- **Name:** Muhammed Rakibul Hasan
+- **Email:** rhrahi14@gmail.com
