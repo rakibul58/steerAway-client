@@ -1,4 +1,6 @@
+import BookingManagement from "@/pages/User/BookingManagement";
 import Overview from "@/pages/User/Overview";
+import PaymentPage from "@/pages/User/PaymentPage";
 
 export const userRoutes = [
   {
@@ -13,6 +15,10 @@ export const userRoutes = [
   {
     path: "booking-management",
     name: "Booking Management",
-    element: <Overview />,
+    element: <BookingManagement />,
+  },
+  {
+    path: "payment-receipt/:id",
+    element: <PaymentPage />,
   },
 ];

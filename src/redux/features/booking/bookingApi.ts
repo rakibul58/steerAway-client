@@ -9,6 +9,7 @@ const bookingApi = baseApi.injectEndpoints({
         method: "POST",
         body: bookingDetails,
       }),
+      invalidatesTags: ["cars"],
     }),
 
     getMyBookings: builder.query({
@@ -57,6 +58,20 @@ const bookingApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["bookings", "cars"],
     }),
+    cancelBooking: builder.mutation({
+      query: (id) => ({
+        url: `/bookings/my-bookings/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["bookings"],
+    }),
+    payment: builder.mutation({
+      query: (id) => ({
+        url: `/bookings/payment/${id}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["bookings"],
+    }),
   }),
 });
 
@@ -65,4 +80,6 @@ export const {
   useGetMyBookingsQuery,
   useGetAllBookingsQuery,
   useUpdateBookingStatusMutation,
+  useCancelBookingMutation,
+  usePaymentMutation,
 } = bookingApi;
