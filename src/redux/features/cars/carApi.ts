@@ -28,7 +28,24 @@ const carApi = baseApi.injectEndpoints({
       }),
       providesTags: ["cars"],
     }),
+    addCar: builder.mutation({
+      query: (carData) => ({
+        url: `/cars`,
+        method: "POST",
+        body: carData,
+      }),
+      invalidatesTags: ["cars"],
+    }),
+    updateCar: builder.mutation({
+      query: (payload) => ({
+        url: `/cars/${payload.id}`,
+        method: "PUT",
+        body: payload.carData,
+      }),
+      invalidatesTags: ["cars"],
+    }),
   }),
 });
 
-export const { useGetAllCarsQuery, useGetSingleCarQuery } = carApi;
+export const { useGetAllCarsQuery, useGetSingleCarQuery, useAddCarMutation, useUpdateCarMutation } =
+  carApi;

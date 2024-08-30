@@ -17,7 +17,7 @@ import { userRoutes } from "@/routes/user.route";
 
 type TRoute = {
   path: string;
-  name: string;
+  name?: string;
   element: ReactElement;
 }[];
 
@@ -68,10 +68,10 @@ const Sidebar = () => {
             Home
           </NavLink>
           {routes.map(
-            (route) =>
-              route.path !== "" && (
+            (route, index) =>
+              route.name && (
                 <NavLink
-                  key={route.name}
+                  key={index}
                   to={route.path}
                   className={({ isActive }) =>
                     isActive ? activeClasses : inActiveClasses
@@ -120,10 +120,10 @@ const Sidebar = () => {
                 Home
               </NavLink>
               {routes.map(
-                (route) =>
+                (route, index) =>
                   route.path !== "" && (
                     <NavLink
-                      key={route.name}
+                      key={index}
                       to={route.path}
                       className={({ isActive }) =>
                         isActive ? activeClasses : inActiveClasses

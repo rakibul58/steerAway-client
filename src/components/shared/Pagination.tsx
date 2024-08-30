@@ -1,10 +1,10 @@
-type TPagination = {
+export interface IPagination {
   page: number;
   totalPage: number;
   setPage: (page: number) => void;
 };
 
-const Pagination = ({ page, totalPage, setPage }: TPagination) => {
+const Pagination = ({ page, totalPage, setPage }: IPagination) => {
   return (
     <div className="inline-flex items-center justify-center gap-3">
       <button
