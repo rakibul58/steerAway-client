@@ -3,7 +3,7 @@ import logo from "../../assets/steer-away-high-resolution-logo-transparent.png";
 
 const Footer = () => {
   return (
-    <footer className="justify-self-end relative mt-20 md:mt-36 bg-primary">
+    <footer className="justify-self-end relative mt-20 md:mt-36 bg-primary w-full">
       {/* Footer Design */}
       <svg
         className="absolute top-0 w-full h-6 -mt-5 sm:-mt-10 sm:h-16 text-secondary"
