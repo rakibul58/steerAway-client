@@ -13,7 +13,7 @@ import loginImg from "../assets/Computer login-bro.svg";
 
 const LoginPage = () => {
   const guestCredentials = {
-    admin: { email: "admin@steerAway.com", password: "123" },
+    admin: { email: "admin@steeraway.com", password: "123" },
     user: { email: "user@test.com", password: "123" },
   };
 

@@ -14,6 +14,7 @@ import ProtectedRoute from "@/components/layout/ProtectedRoute";
 import CarDetails from "@/pages/CarDetails";
 import Booking from "@/pages/Booking";
 import BookingConfirmation from "@/pages/BookingConfirmation";
+import SupportPage from "@/pages/Support";
 
 export const router = createBrowserRouter([
   {
@@ -48,6 +49,10 @@ export const router = createBrowserRouter([
       {
         path: "contact",
         element: <Contact />,
+      },
+      {
+        path: "support",
+        element: <SupportPage />,
       },
       {
         path: "/booking/:id",

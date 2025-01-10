@@ -265,6 +265,17 @@ const Navbar = () => {
             >
               Contact
             </NavLink>
+
+            <NavLink
+              to="/support"
+              className={({ isActive }) =>
+                `${
+                  isActive ? "text-primary font-bold" : "text-muted-foreground"
+                } hover:text-primary transition-colors`
+              }
+            >
+              Support
+            </NavLink>
           </nav>
 
           {/* Mobile Menu */}
@@ -331,6 +342,18 @@ const Navbar = () => {
                   }
                 >
                   Contact
+                </NavLink>
+                <NavLink
+                  to="/support"
+                  className={({ isActive }) =>
+                    `${
+                      isActive
+                        ? "text-primary font-bold"
+                        : "text-muted-foreground"
+                    } hover:text-primary transition-colors`
+                  }
+                >
+                  Support
                 </NavLink>
 
                 {token === null ? (

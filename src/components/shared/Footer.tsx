@@ -161,7 +161,7 @@ const Footer = () => {
             <ul className="space-y-2">
               <li>
                 <Link
-                  to="/help"
+                  to="/support"
                   className="text-muted-foreground hover:text-primary"
                 >
                   Help Center
@@ -177,7 +177,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/faq"
+                  to="/support"
                   className="text-muted-foreground hover:text-primary"
                 >
                   FAQs
@@ -185,7 +185,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/terms"
+                  to="/support"
                   className="text-muted-foreground hover:text-primary"
                 >
                   Terms & Conditions
@@ -193,7 +193,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/privacy"
+                  to="/support"
                   className="text-muted-foreground hover:text-primary"
                 >
                   Privacy Policy
