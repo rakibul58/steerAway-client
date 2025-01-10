@@ -89,6 +89,7 @@ const CarListing = () => {
   const handlePageChange = (newPage: number) => {
     setIsFiltering(true);
 
+    
     setFilters((prev) => ({
       ...prev,
       page: newPage.toString(),
@@ -116,12 +117,22 @@ const CarListing = () => {
     fuelTypes: ["petrol", "diesel", "electric", "hybrid"],
     transmission: ["automatic", "manual"],
     features: [
-      "GPS",
-      "Bluetooth",
-      "Sunroof",
-      "Leather Seats",
-      "Child Seat",
-      "WiFi",
+      "Panoramic Sunroof",
+      "Panoramic Fixed Glass Roof",
+      "Meridian Premium Audio",
+      "Meridian™ Surround Sound",
+      "Bang & Olufsen Sound",
+      "Apple CarPlay Integration",
+      "Android Auto Integration",
+      "12-inch Touchscreen",
+      "10.25-inch Touchscreen",
+      "Dual-Zone Climate Control",
+      "Carbon Fiber Roof",
+      "Adaptive Air Suspension",
+      "Dynamic Air Suspension",
+      "Matrix LED Headlights",
+      "Pixel LED Headlights",
+      "Heated/Ventilated Seats",
     ],
     status: ["available", "reserved", "booked"],
     sortOptions: [
@@ -133,7 +144,7 @@ const CarListing = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 md:mt-24 mt-12">
+    <div className="max-w-7xl mx-auto px-4 py-8 md:mt-24 mt-12 car-listing-container">
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -280,12 +291,9 @@ const CarListing = () => {
                       >
                         <input
                           type="checkbox"
-                          checked={filters.features === feature.toLowerCase()}
+                          checked={filters.features === feature}
                           onChange={() =>
-                            handleFilterChange(
-                              "features",
-                              feature.toLowerCase()
-                            )
+                            handleFilterChange("features", feature)
                           }
                           className="accent-blue-500"
                         />
