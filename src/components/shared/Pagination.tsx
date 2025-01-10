@@ -12,7 +12,7 @@ const Pagination = ({ page, totalPage, setPage }: IPagination) => {
         onClick={() => {
           if (page > 1) setPage(page - 1);
         }}
-        className="inline-flex size-8 items-center justify-center rounded border-2 hover:bg-secondary rtl:rotate-180 disabled:bg-stone-50 disabled:dark:bg-stone-600"
+        className="inline-flex size-8 items-center justify-center rounded border-2 hover:bg-secondary rtl:rotate-180 disabled:bg-stone-50 disabled:dark:bg-primary-foreground"
       >
         <span className="sr-only">Next Page</span>
         <svg

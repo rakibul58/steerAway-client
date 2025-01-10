@@ -3,7 +3,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Button } from "../ui/button";
 import { useGetAllCarsQuery } from "@/redux/features/cars/carApi";
-import { TCar } from "@/Types";
+import { ICar } from "@/Types";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import SkeletonCard from "../shared/SkeletonCard";
@@ -16,7 +16,7 @@ const Featured = () => {
     dots: true,
     infinite: true,
     speed: 500,
-    slidesToShow: 3,
+    slidesToShow: 4,
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
@@ -47,7 +47,7 @@ const Featured = () => {
 
   useEffect(() => {
     if (isFetching || isLoading) {
-      toast.loading("Fetching Cars", {duration: 3000});
+      toast.loading("Fetching Cars", { duration: 3000 });
     } else {
       toast.dismiss();
       toast.success("Cars Fetched Successfully", { duration: 1000 });
@@ -68,7 +68,7 @@ const Featured = () => {
 
         <div>
           {isFetching || isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               <SkeletonCard />
               <SkeletonCard />
               <SkeletonCard />
@@ -76,7 +76,7 @@ const Featured = () => {
           ) : cars?.data && cars?.data?.result?.length ? (
             <>
               <Slider {...settings}>
-                {cars?.data?.result?.map((car: TCar) => (
+                {cars?.data?.result?.map((car: ICar) => (
                   <ProductCard key={car._id} {...car} />
                 ))}
               </Slider>
