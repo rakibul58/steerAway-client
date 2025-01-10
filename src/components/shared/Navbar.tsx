@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,7 +9,6 @@ import {
   Car,
   Calendar,
   Phone,
-  User,
   Zap,
   Filter,
   Settings,
@@ -23,6 +22,8 @@ import {
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGetNavbarQuery } from "@/redux/features/cars/carApi";
+import UserAvatarDropdown from "./AvatarDropDown";
+import { useProfileQuery } from "@/redux/features/auth/authApi";
 
 interface Brand {
   name: string;
@@ -31,7 +32,7 @@ interface Brand {
 }
 
 interface FeaturedCar {
-  id: string;
+  _id: string;
   slug: string;
   image: string;
   name: string;
@@ -50,7 +51,7 @@ const Navbar = () => {
   const token = useAppSelector(useCurrentToken);
   const user = useAppSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
+  const { data: profile } = useProfileQuery(undefined);
   const { data: navbarData } = useGetNavbarQuery(undefined);
 
   useEffect(() => {
@@ -103,7 +104,7 @@ const Navbar = () => {
               {navbarData?.data?.carTypes.slice(0, 3).map((type: any) => (
                 <Link
                   key={type.type}
-                  to={`/cars/type/${type.type}`}
+                  to={`/car-listings?specifications.fuelType=${type.type}`}
                   className="flex items-center gap-1 text-sm hover:text-primary transition-colors"
                 >
                   {getFuelTypeIcon(type.type)}
@@ -176,7 +177,7 @@ const Navbar = () => {
                             .map((brand: Brand) => (
                               <div key={brand.name} className="space-y-2">
                                 <Link
-                                  to={`/cars/brand/${brand.name.toLowerCase()}`}
+                                  to={`/car-listings?searchTerm=${brand.name.toLowerCase()}`}
                                   className="font-medium hover:text-primary transition-colors"
                                 >
                                   {brand.name}
@@ -187,7 +188,7 @@ const Navbar = () => {
                                     .map((model: string) => (
                                       <Link
                                         key={model}
-                                        to={`/cars/brand/${brand.name.toLowerCase()}/${model.toLowerCase()}`}
+                                        to={`/car-listings?searchTerm=${model.toLowerCase()}`}
                                         className="block text-sm text-muted-foreground hover:text-primary transition-colors"
                                       >
                                         {model}
@@ -206,8 +207,8 @@ const Navbar = () => {
                           {navbarData?.data?.featuredCars.map(
                             (car: FeaturedCar) => (
                               <Link
-                                key={car.id}
-                                to={`/car/${car.slug}`}
+                                key={car._id}
+                                to={`/car-details/${car._id}`}
                                 className="flex items-center gap-4 hover:bg-primary/5 p-2 rounded-lg transition-colors group"
                               >
                                 <img
@@ -337,19 +338,11 @@ const Navbar = () => {
                     <Button className="w-full">Sign In</Button>
                   </Link>
                 ) : (
-                  <div className="space-y-4">
-                    <Link to={`/${user?.role}/overview`}>
-                      <Button variant="outline" className="w-full">
-                        Dashboard
-                      </Button>
-                    </Link>
-                    <Button
-                      onClick={() => dispatch(logout())}
-                      className="w-full"
-                    >
-                      Logout
-                    </Button>
-                  </div>
+                  <UserAvatarDropdown
+                    onLogout={() => dispatch(logout())}
+                    role={user?.role as string}
+                    user={profile?.data}
+                  />
                 )}
               </nav>
             </SheetContent>
@@ -367,22 +360,11 @@ const Navbar = () => {
                 </Link>
               </>
             ) : (
-              <div className="flex items-center gap-4">
-                <Link to={`/${user?.role}/overview`}>
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <User className="w-4 h-4" />
-                    Dashboard
-                  </Button>
-                </Link>
-                <Button
-                  onClick={() => {
-                    dispatch(logout());
-                    navigate("/");
-                  }}
-                >
-                  Logout
-                </Button>
-              </div>
+              <UserAvatarDropdown
+                onLogout={() => dispatch(logout())}
+                role={user?.role as string}
+                user={profile?.data}
+              />
             )}
           </div>
         </header>

@@ -1,5 +1,4 @@
 import CompanyHistory from "@/components/About/CompanyHistory";
-import Contact from "@/components/About/Contact";
 import Fleet from "@/components/About/Fleet";
 import Header from "@/components/About/Header";
 import MeetTheTeam from "@/components/About/MeetTheTeam";
@@ -13,7 +12,6 @@ const About = () => {
       <MeetTheTeam />
       <Fleet />
       <ValuesCommitment />
-      <Contact />
     </div>
   );
 };

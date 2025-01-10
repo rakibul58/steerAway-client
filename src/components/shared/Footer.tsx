@@ -49,20 +49,20 @@ const Footer = () => {
           <div className="space-y-4">
             <h2 className="text-2xl font-bold">SteerAway</h2>
             <p className="text-muted-foreground">
-              Your trusted partner in car rentals, providing premium vehicles and exceptional service since 2010.
+              Your trusted partner in car rentals, providing premium vehicles and exceptional service since 2024.
             </p>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Phone size={16} className="text-primary" />
-                <span>+1 234 567 8900</span>
+                <span>(+880) 1850415714</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail size={16} className="text-primary" />
-                <span>support@steeraway.com</span>
+                <span>rhrahi14@gmail.com</span>
               </div>
               <div className="flex items-center gap-2">
                 <MapPin size={16} className="text-primary" />
-                <span>123 Main St, City, State</span>
+                <span>Colonel Hat, Chittagong</span>
               </div>
               <div className="flex items-center gap-2">
                 <Clock size={16} className="text-primary" />
@@ -81,23 +81,8 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/vehicles" className="text-muted-foreground hover:text-primary">
+                <Link to="/car-listings" className="text-muted-foreground hover:text-primary">
                   Our Fleet
-                </Link>
-              </li>
-              <li>
-                <Link to="/locations" className="text-muted-foreground hover:text-primary">
-                  Locations
-                </Link>
-              </li>
-              <li>
-                <Link to="/deals" className="text-muted-foreground hover:text-primary">
-                  Special Offers
-                </Link>
-              </li>
-              <li>
-                <Link to="/blog" className="text-muted-foreground hover:text-primary">
-                  Blog
                 </Link>
               </li>
             </ul>
@@ -108,30 +93,21 @@ const Footer = () => {
             <h3 className="font-bold mb-4">Vehicle Categories</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/vehicles/luxury" className="text-muted-foreground hover:text-primary">
-                  Luxury Cars
+                <Link to="/car-listings?specifications.fuelType=petrol" className="text-muted-foreground hover:text-primary">
+                  Petrol Cars
                 </Link>
               </li>
               <li>
-                <Link to="/vehicles/suv" className="text-muted-foreground hover:text-primary">
-                  SUVs
+                <Link to="/car-listings?specifications.fuelType=electric" className="text-muted-foreground hover:text-primary">
+                  Electric Cars
                 </Link>
               </li>
               <li>
-                <Link to="/vehicles/electric" className="text-muted-foreground hover:text-primary">
-                  Electric Vehicles
+                <Link to="/car-listings?specifications.fuelType=hybrid" className="text-muted-foreground hover:text-primary">
+                  Hybrid Cars
                 </Link>
               </li>
-              <li>
-                <Link to="/vehicles/economy" className="text-muted-foreground hover:text-primary">
-                  Economy Cars
-                </Link>
-              </li>
-              <li>
-                <Link to="/vehicles/premium" className="text-muted-foreground hover:text-primary">
-                  Premium Cars
-                </Link>
-              </li>
+            
             </ul>
           </div>
 
@@ -172,7 +148,7 @@ const Footer = () => {
         <div className="border-t mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-muted-foreground">
-              © 2024 SteerAway. All rights reserved.
+              © {new Date().getFullYear()} SteerAway. All rights reserved.
             </p>
             <div className="flex gap-4">
               <Link to="#" className="text-muted-foreground hover:text-primary">

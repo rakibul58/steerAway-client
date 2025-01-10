@@ -16,6 +16,7 @@ const CarListing = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(true);
   const [isFiltering, setIsFiltering] = useState(false);
+  
 
   // Initialize filters from URL params including page
   const [filters, setFilters] = useState({
@@ -89,7 +90,7 @@ const CarListing = () => {
   const handlePageChange = (newPage: number) => {
     setIsFiltering(true);
 
-    
+
     setFilters((prev) => ({
       ...prev,
       page: newPage.toString(),
