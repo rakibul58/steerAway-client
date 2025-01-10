@@ -118,14 +118,18 @@ const ManageReturn = () => {
                       </span>
                     </td>
 
-                    <td className="px-4 py-2">৳{booking.car.pricePerHour}</td>
-                    <td className="px-4 py-2">৳{Math.floor(booking.rentingCost)}</td>
-                    <td className="px-4 py-2 text-sm flex flex-col items-start">
-                      <span>Insurance: ৳{booking.insuranceCost}</span>
-                      <span>Baby Seat: ৳{booking.childSeatCost}</span>
-                      <span>GPS: ৳{booking.gpsCost}</span>
+                    <td className="px-4 py-2">${booking.car.pricePerHour}</td>
+                    <td className="px-4 py-2">
+                      ${Math.floor(booking.rentingCost)}
                     </td>
-                    <td className="px-4 py-2">৳{Math.floor(booking.totalCost)}</td>
+                    <td className="px-4 py-2 text-sm flex flex-col items-start">
+                      <span>Insurance: ${booking.insuranceCost}</span>
+                      <span>Baby Seat: ${booking.childSeatCost}</span>
+                      <span>GPS: ${booking.gpsCost}</span>
+                    </td>
+                    <td className="px-4 py-2">
+                      ${Math.floor(booking.totalCost)}
+                    </td>
                     <td className="px-4 py-2">
                       <span
                         className={`inline-block px-2 py-1 text-sm rounded ${

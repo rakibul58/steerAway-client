@@ -49,24 +49,24 @@ const PaymentPage = () => {
           </div>
           <div className="flex justify-between mb-2">
             <span>Rental Cost:</span>
-            <span>৳{Math.floor(state?.rentingCost) || 0}</span>
+            <span>${Math.floor(state?.rentingCost) || 0}</span>
           </div>
           <div className="flex justify-between mb-2">
             <span>Insurance:</span>
-            <span>৳{state.insuranceCost}</span>
+            <span>${state.insuranceCost}</span>
           </div>
           <div className="flex justify-between mb-2">
             <span>GPS:</span>
-            <span>৳{state.gpsCost}</span>
+            <span>${state.gpsCost}</span>
           </div>
           <div className="flex justify-between mb-2">
             <span>Child Seat:</span>
-            <span>৳{state.childSeatCost}</span>
+            <span>${state.childSeatCost}</span>
           </div>
           <hr className="my-4" />
           <div className="flex justify-between font-bold">
             <span>Total:</span>
-            <span>৳{Math.floor(state?.totalCost)}</span>
+            <span>${Math.floor(state?.totalCost)}</span>
           </div>
         </div>
 

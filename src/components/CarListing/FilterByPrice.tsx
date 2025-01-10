@@ -62,11 +62,11 @@ const FilterByPrice = ({
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Select Price Range</SelectLabel>
-          <SelectItem value="range1">0 - 100৳</SelectItem>
-          <SelectItem value="range2">101৳ - 300৳</SelectItem>
-          <SelectItem value="range3">301৳ - 500৳</SelectItem>
-          <SelectItem value="range4">501৳ - 700৳</SelectItem>
-          <SelectItem value="range5">701৳+</SelectItem>
+          <SelectItem value="range1">0 - 100$</SelectItem>
+          <SelectItem value="range2">101$ - 300$</SelectItem>
+          <SelectItem value="range3">301$ - 500$</SelectItem>
+          <SelectItem value="range4">501$ - 700$</SelectItem>
+          <SelectItem value="range5">701$+</SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>

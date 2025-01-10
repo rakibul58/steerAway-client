@@ -28,6 +28,13 @@ const carApi = baseApi.injectEndpoints({
       }),
       providesTags: ["cars"],
     }),
+    getRelatedCars: builder.query({
+      query: (id: string) => ({
+        url: `/cars/related/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["cars"],
+    }),
     getNavbar: builder.query({
       query: () => ({
         url: `/cars/getCarCategories`,
@@ -76,5 +83,6 @@ export const {
   useUpdateCarMutation,
   useDeleteCarMutation,
   useReturnCarMutation,
-  useGetNavbarQuery
+  useGetNavbarQuery,
+  useGetRelatedCarsQuery
 } = carApi;

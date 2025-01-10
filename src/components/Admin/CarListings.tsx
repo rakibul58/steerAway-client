@@ -57,10 +57,11 @@ const CarListings = ({
                           : "bg-red-200 text-red-800"
                       }`}
                     >
-                      {car.status?.charAt(0).toLocaleUpperCase()}{car.status?.slice(1)}
+                      {car.status?.charAt(0).toLocaleUpperCase()}
+                      {car.status?.slice(1)}
                     </div>
                   </td>
-                  <td className="px-4 py-2">৳{car.pricePerHour || "N/A"}</td>
+                  <td className="px-4 py-2">${car.pricePerHour || "N/A"}</td>
                   <td className="px-4 py-2">{car.carType || "N/A"}</td>
                   <td className="px-4 py-2 space-x-0 lg:space-x-2 space-y-2">
                     <Link to={`/admin/edit-car/${car._id}`} className="">

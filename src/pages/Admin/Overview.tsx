@@ -105,8 +105,11 @@ const Overview = () => {
         <StatCard title="Total Bookings" value={totalBookings} />
         <StatCard title="Total Cars" value={totalCars} />
         <StatCard title="Available Cars" value={availableCars} />
-        <StatCard title="Total Revenue" value={`৳${Math.floor(revenue)}`} />
-        <StatCard title="Account Receivable" value={`৳${Math.floor(receivable)}`} />
+        <StatCard title="Total Revenue" value={`$${Math.floor(revenue)}`} />
+        <StatCard
+          title="Account Receivable"
+          value={`$${Math.floor(receivable)}`}
+        />
         <StatCard title="Active Reservations" value={activeReservations} />
         <StatCard title="Pending Reservations" value={pendingReservation} />
         <StatCard title="Cancelled Reservations" value={cancelledReservation} />

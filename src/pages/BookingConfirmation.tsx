@@ -16,7 +16,7 @@ const BookingConfirmation = () => {
   }
 
   const handleConfirmBooking = async () => {
-    const toastId = toast.loading("Booking...", {duration: 3000});
+    const toastId = toast.loading("Booking...", { duration: 3000 });
     try {
       const res = await bookCar(bookingDetails).unwrap();
       toast.success(res.message, { id: toastId, duration: 2000 });
@@ -31,14 +31,14 @@ const BookingConfirmation = () => {
   };
 
   return (
-    <section className="py-16">
+    <section className="py-16 mt-12 md:mt-24">
       <div className="container mx-auto px-6 lg:px-12">
         <h1 className="text-3xl font-bold mb-8">Confirm Your Booking</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           <div>
             <h2 className="text-2xl font-semibold">Car Details</h2>
             <p>Car: {data?.data?.name}</p>
-            <p>Price: ৳{data?.data?.pricePerHour}/Hour</p>
+            <p>Price: ${data?.data?.pricePerHour}/Hour</p>
           </div>
 
           <div>
