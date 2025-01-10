@@ -53,7 +53,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <img 
             src={images[0]} 
             alt={name} 
-            className="w-full h-52 object-cover"
+            className="w-full h-52 object-cover rounded-t-md"
           />
           <Badge 
             className={`absolute top-4 right-4 ${

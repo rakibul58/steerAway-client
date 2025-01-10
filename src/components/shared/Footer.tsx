@@ -1,22 +1,38 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Facebook, 
-  Twitter, 
-  Instagram, 
+import {
+  Facebook,
+  Twitter,
+  Instagram,
   Youtube,
   Phone,
   Mail,
   MapPin,
-  Clock
-} from 'lucide-react';
+  Clock,
+} from "lucide-react";
+import { toast } from "sonner";
+import { useSubscribeNewsletterMutation } from "@/redux/features/newsletter/newsletterApi";
+import { useForm } from "react-hook-form";
 
 const Footer = () => {
-  const handleNewsletterSubmit = (e: any) => {
-    e.preventDefault();
-    // Handle newsletter submission
+  const [subscribeNewsletter] = useSubscribeNewsletterMutation();
+  const { register, handleSubmit, reset } = useForm<{ email: string }>();
+
+  const handleSubscribe = async (data: { email: string }) => {
+    const toastId = toast.loading("subscribing in", { duration: 3000 });
+    try {
+      const res = await subscribeNewsletter(data?.email).unwrap();
+      toast.success(res.message, { id: toastId, duration: 2000 });
+      reset();
+    } catch (err: any) {
+      reset();
+      toast.error(err.data.message || "Something went wrong", {
+        id: toastId,
+        duration: 2000,
+      });
+    }
   };
 
   return (
@@ -28,16 +44,29 @@ const Footer = () => {
             <div>
               <h3 className="text-2xl font-bold mb-2">Join Our Newsletter</h3>
               <p className="text-primary-foreground/80">
-                Stay updated with our latest offers, new vehicles, and exclusive deals
+                Stay updated with our latest offers, new vehicles, and exclusive
+                deals
               </p>
             </div>
-            <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
-              <Input 
-                type="email" 
-                placeholder="Enter your email" 
+            <form
+              onSubmit={handleSubmit(handleSubscribe)}
+              className="flex gap-2"
+            >
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /\S+@\S+\.\S+/,
+                    message: "Entered value does not match email format",
+                  },
+                })}
                 className="bg-white text-foreground"
               />
-              <Button variant="secondary">Subscribe</Button>
+              <Button type="submit" variant="secondary">
+                Subscribe
+              </Button>
             </form>
           </div>
         </div>
@@ -49,7 +78,8 @@ const Footer = () => {
           <div className="space-y-4">
             <h2 className="text-2xl font-bold">SteerAway</h2>
             <p className="text-muted-foreground">
-              Your trusted partner in car rentals, providing premium vehicles and exceptional service since 2024.
+              Your trusted partner in car rentals, providing premium vehicles
+              and exceptional service since 2024.
             </p>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
@@ -76,12 +106,18 @@ const Footer = () => {
             <h3 className="font-bold mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/about" className="text-muted-foreground hover:text-primary">
+                <Link
+                  to="/about"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   About Us
                 </Link>
               </li>
               <li>
-                <Link to="/car-listings" className="text-muted-foreground hover:text-primary">
+                <Link
+                  to="/car-listings"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   Our Fleet
                 </Link>
               </li>
@@ -93,21 +129,29 @@ const Footer = () => {
             <h3 className="font-bold mb-4">Vehicle Categories</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/car-listings?specifications.fuelType=petrol" className="text-muted-foreground hover:text-primary">
+                <Link
+                  to="/car-listings?specifications.fuelType=petrol"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   Petrol Cars
                 </Link>
               </li>
               <li>
-                <Link to="/car-listings?specifications.fuelType=electric" className="text-muted-foreground hover:text-primary">
+                <Link
+                  to="/car-listings?specifications.fuelType=electric"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   Electric Cars
                 </Link>
               </li>
               <li>
-                <Link to="/car-listings?specifications.fuelType=hybrid" className="text-muted-foreground hover:text-primary">
+                <Link
+                  to="/car-listings?specifications.fuelType=hybrid"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   Hybrid Cars
                 </Link>
               </li>
-            
             </ul>
           </div>
 
@@ -116,27 +160,42 @@ const Footer = () => {
             <h3 className="font-bold mb-4">Support</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/help" className="text-muted-foreground hover:text-primary">
+                <Link
+                  to="/help"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   Help Center
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-muted-foreground hover:text-primary">
+                <Link
+                  to="/contact"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   Contact Us
                 </Link>
               </li>
               <li>
-                <Link to="/faq" className="text-muted-foreground hover:text-primary">
+                <Link
+                  to="/faq"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   FAQs
                 </Link>
               </li>
               <li>
-                <Link to="/terms" className="text-muted-foreground hover:text-primary">
+                <Link
+                  to="/terms"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   Terms & Conditions
                 </Link>
               </li>
               <li>
-                <Link to="/privacy" className="text-muted-foreground hover:text-primary">
+                <Link
+                  to="/privacy"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   Privacy Policy
                 </Link>
               </li>

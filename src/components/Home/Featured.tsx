@@ -72,6 +72,7 @@ const Featured = () => {
               <SkeletonCard />
               <SkeletonCard />
               <SkeletonCard />
+              <SkeletonCard />
             </div>
           ) : cars?.data && cars?.data?.result?.length ? (
             <>
