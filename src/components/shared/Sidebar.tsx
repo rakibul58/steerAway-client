@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
 import { Menu, Car, LogOut, User, ChevronRight } from "lucide-react";
@@ -58,8 +58,8 @@ const Sidebar = () => {
     };
 
     handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const activeClasses = `
@@ -93,17 +93,21 @@ const Sidebar = () => {
       <div className="flex flex-col h-full p-4">
         {/* Header with Logo */}
         <div className="flex items-center gap-3 mb-8">
-          <Car className="h-8 w-8 text-primary" />
-          {!isCollapsed && (
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.1 }}
-              className="text-xl font-bold"
-            >
-              SteerAway
-            </motion.span>
-          )}
+          <Link className="flex gap-3" to={"/"}>
+            {" "}
+            <Car className="h-8 w-8 text-primary" />
+            {!isCollapsed && (
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1 }}
+                className="text-xl font-bold"
+              >
+                SteerAway
+              </motion.span>
+            )}
+          </Link>
+
           <Button
             variant="ghost"
             size="icon"
@@ -136,9 +140,7 @@ const Sidebar = () => {
                     }
                   >
                     {route.name && (
-                      <>
-                        {!isCollapsed && <span>{route.name}</span>}
-                      </>
+                      <>{!isCollapsed && <span>{route.name}</span>}</>
                     )}
                   </NavLink>
                 </motion.div>
@@ -207,10 +209,10 @@ const Sidebar = () => {
       </SheetTrigger>
       <SheetContent side="left" className="w-72 p-0">
         <div className="flex flex-col h-full p-4">
-          <div className="flex items-center gap-3 mb-8">
+          <Link to={'/'} className="flex items-center gap-3 mb-8">
             <Car className="h-8 w-8 text-primary" />
             <span className="text-xl font-bold">SteerAway</span>
-          </div>
+          </Link>
           <nav className="flex-1 space-y-2">
             {routes.map(
               (route, index) =>

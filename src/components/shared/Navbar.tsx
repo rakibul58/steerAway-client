@@ -76,7 +76,7 @@ const Navbar = () => {
 
   return (
     <div
-      className={`fixed top-0 left-0 right-0 z-[100] w-full max-w-7xl
+      className={`fixed top-0 left-0 right-0 z-[100] w-full
         mx-auto transition-all duration-300 ${
           isScrolled ? "bg-background" : "bg-background"
         }`}
@@ -120,7 +120,7 @@ const Navbar = () => {
       </div>
 
       {/* Main Navbar */}
-      <div className="w-full mx-auto px-4">
+      <div className="w-full mx-auto px-4 max-w-7xl">
         <header
           className={`flex items-center mx-auto justify-between transition-all duration-300 ${
             isScrolled ? "py-2" : "py-4"
@@ -309,7 +309,7 @@ const Navbar = () => {
                       .map((brand: Brand) => (
                         <Link
                           key={brand.name}
-                          to={`/cars/brand/${brand.name.toLowerCase()}`}
+                          to={`/car-listings?searchTerm=${brand.name.toLowerCase()}`}
                           className="text-muted-foreground hover:text-primary transition-colors"
                         >
                           {brand.name} ({brand.totalCars})

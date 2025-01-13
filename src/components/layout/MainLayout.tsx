@@ -11,9 +11,11 @@ const MainLayout = () => {
     window.scrollTo(0, 0);
   }, [pathname]);
   return (
-    <div className="w-full max-w-7xl min-h-screen mx-auto px-4 lg:px-0">
+    <div className="w-full">
       <Navbar />
-      <Outlet />
+      <div className="max-w-7xl min-h-screen mx-auto px-4 lg:px-0">
+        <Outlet />
+      </div>
       <Footer />
     </div>
   );

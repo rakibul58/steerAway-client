@@ -1,234 +1,465 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 import {
-  useProfileQuery,
-  useUpdateProfileMutation,
-} from "@/redux/features/auth/authApi";
-import { toast } from "sonner";
-import { useGetMyBookingsQuery } from "@/redux/features/booking/bookingApi";
-
-interface IProfileForm {
-  name: string;
-  email: string;
-  phone: string;
-  preferences: string;
-  address: string;
-}
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import {
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  Tooltip,
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+} from "recharts";
+import { Car, CreditCard, Calendar, ClockIcon } from "lucide-react";
+import { useUserDashboardQuery } from "@/redux/features/dashboard/dashboardApi";
 
 const Overview = () => {
   const {
-    data: user,
-    isFetching: isProfileFetching,
-    isLoading: isProfileLoading,
-  } = useProfileQuery(undefined);
-  const {
-    data: bookings,
-    isFetching: isBookingFetching,
-    isLoading: isBookingLoading,
-  } = useGetMyBookingsQuery([
-    {
-      name: "sort",
-      value: "-createdAt",
-    },
-    {
-      name: "limit",
-      value: 3,
-    },
-  ]);
-  const [updateProfile] = useUpdateProfileMutation();
-  const [isEditing, setIsEditing] = useState(false);
+    data: userDashboard,
+    isFetching,
+    isLoading,
+    isError,
+  } = useUserDashboardQuery(undefined);
 
-  useEffect(() => {
-    if (
-      isProfileFetching ||
-      isProfileLoading ||
-      isBookingFetching ||
-      isBookingLoading
-    ) {
-      toast.loading("Fetching Dashboard", { duration: 3000 });
-    } else {
-      toast.dismiss();
-      toast.success("Dashboard Fetched Successfully", { duration: 1000 });
-    }
-  }, [
-    isProfileFetching,
-    isProfileLoading,
-    isBookingFetching,
-    isBookingLoading,
-  ]);
+  if (isLoading || isFetching) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading...
+      </div>
+    );
+  }
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<IProfileForm>();
+  if (isError) {
+    return <div className="text-red-500">Error: Failed to fetch</div>;
+  }
 
-  const onSubmit: SubmitHandler<IProfileForm> = async (data) => {
-    const toastId = toast.loading("Profile Updating...", { duration: 3000 });
-    try {
-      const res = await updateProfile(data).unwrap();
-      toast.success(res.message, { id: toastId, duration: 2000 });
-      setIsEditing(false);
-    } catch (err: any) {
-      toast.error(err.data.message || "Something went wrong", {
-        id: toastId,
-        duration: 2000,
-      });
-    }
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+
+  const spendingData = Object.entries(userDashboard?.data?.userStats.spending.byType).map(
+    ([key, value]) => ({
+      name: key.replace("Costs", ""),
+      value,
+    })
+  );
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
   };
 
+  const featureUsage = userDashboard?.data?.userStats.activeRentals.reduce((acc: Record<string, number>, rental: any) => {
+    Object.entries(rental.additionalFeatures).forEach(([feature, used]) => {
+      if (used) acc[feature] = (acc[feature] || 0) + 1;
+    });
+    return acc;
+  }, {});
+
+  const rentalHistory = userDashboard?.data?.userStats.activeRentals.map((rental: any) => ({
+    car: rental.car,
+    cost: rental.cost,
+    features: Object.values(rental.additionalFeatures).filter(Boolean).length
+  }));
+
   return (
-    <section className="">
-      <div className="px-6">
-        <h1 className="text-3xl font-bold mb-8">User Dashboard</h1>
+    <div className="px-4 min-h-screen">
+      <h1 className="text-3xl font-bold mb-8">My Dashboard</h1>
 
-        {/* Profile Overview Section */}
-        <div className="p-6 rounded-lg shadow-xl border mb-8">
-          <h2 className="text-2xl font-semibold mb-4">Profile Overview</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <p className="font-medium">Name:</p>
-              <p>{user?.data?.name}</p>
-            </div>
-            <div>
-              <p className="font-medium">Email:</p>
-              <p>{user?.data?.email}</p>
-            </div>
-            <div>
-              <p className="font-medium">Phone:</p>
-              <p>{user?.data?.phone || "N/A"}</p>
-            </div>
-            <div>
-              <p className="font-medium">Address:</p>
-              <p>{user?.data?.address || "N/A"}</p>
-            </div>
-            <div>
-              <p className="font-medium">Preferences:</p>
-              <p>{user?.data?.preferences || "N/A"} </p>
-            </div>
-          </div>
-          <Button className="mt-6" onClick={() => setIsEditing(true)}>
-            Edit Profile
-          </Button>
-        </div>
-
-        {/* Edit Profile Section */}
-        {isEditing && (
-          <div className="shadow-xl border p-6 rounded-lg mb-8">
-            <h2 className="text-2xl font-semibold mb-4">Edit Profile</h2>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div>
-                <label htmlFor="name" className="block mb-2 font-medium">
-                  Name
-                </label>
-                <input
-                  defaultValue={user?.data?.name}
-                  id="name"
-                  {...register("name", { required: "Name is required" })}
-                  className="py-3 px-4 w-full rounded-sm bg-secondary shadow-md"
-                />
-                {errors.name && (
-                  <span className="text-destructive">
-                    {errors.name.message}
-                  </span>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="email" className="block mb-2 font-medium">
-                  Email
-                </label>
-                <input
-                  id="email"
-                  defaultValue={user?.data?.email}
-                  {...register("email", {
-                    required: "Email is required",
-                    pattern: {
-                      value: /\S+@\S+\.\S+/,
-                      message: "Invalid email address",
-                    },
-                  })}
-                  className="py-3 px-4 w-full rounded-sm bg-secondary shadow-md"
-                />
-                {errors.email && (
-                  <span className="text-destructive">
-                    {errors.email.message}
-                  </span>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="phone" className="block mb-2 font-medium">
-                  Phone
-                </label>
-                <input
-                  id="phone"
-                  defaultValue={user?.data?.phone}
-                  {...register("phone")}
-                  className="py-3 px-4 w-full rounded-sm bg-secondary shadow-md"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="address" className="block mb-2 font-medium">
-                  Address
-                </label>
-                <input
-                  id="address"
-                  defaultValue={user?.data?.address}
-                  {...register("address")}
-                  className="py-3 px-4 w-full rounded-sm bg-secondary shadow-md"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="preferences" className="block mb-2 font-medium">
-                  Preferences
-                </label>
-                <textarea
-                  id="preferences"
-                  defaultValue={user?.data?.preferences}
-                  {...register("preferences")}
-                  className="py-3 px-4 w-full rounded-sm bg-secondary shadow-md"
-                />
-              </div>
-
-              <Button type="submit" className="w-full">
-                Save Changes
-              </Button>
-              <Button
-                type="button"
-                className="w-full mt-4"
-                variant="secondary"
-                onClick={() => setIsEditing(false)}
-              >
-                Cancel
-              </Button>
-            </form>
-          </div>
-        )}
-
-        {/* Booking History Section */}
-        <div className="p-6 rounded-lg shadow-xl border">
-          <h2 className="text-2xl font-semibold mb-4">Booking History</h2>
-          {bookings?.data?.result?.length > 0 ? (
-            <div className="space-y-4">
-              {bookings?.data?.result?.map((booking: any, index: string) => (
-                <div key={index} className="border-b pb-4">
-                  <p className="font-medium">Car: {booking?.car?.name}</p>
-                  <p>Rental Date: {booking.date}</p>
-                  <p>Booking Status: {booking.status}</p>
+      {/* Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.1 }}
+        >
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-blue-100 rounded-full">
+                  <CreditCard className="h-6 w-6 text-blue-600" />
                 </div>
-              ))}
-            </div>
-          ) : (
-            <p>No bookings found.</p>
-          )}
-        </div>
+                <div>
+                  <p className="text-sm text-gray-500">Total Spent</p>
+                  <h3 className="text-2xl font-bold">
+                    ${userDashboard?.data?.overview.totalSpent.toLocaleString()}
+                  </h3>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.2 }}
+        >
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-green-100 rounded-full">
+                  <Car className="h-6 w-6 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Active Rentals</p>
+                  <h3 className="text-2xl font-bold">
+                    {userDashboard?.data?.overview.activeBookings}
+                  </h3>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.3 }}
+        >
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-purple-100 rounded-full">
+                  <Calendar className="h-6 w-6 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Completed Bookings</p>
+                  <h3 className="text-2xl font-bold">
+                    {userDashboard?.data?.overview.completedBookings}
+                  </h3>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.4 }}
+        >
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-yellow-100 rounded-full">
+                  <ClockIcon className="h-6 w-6 text-yellow-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Pending Payments</p>
+                  <h3 className="text-2xl font-bold">
+                    {userDashboard?.data?.overview.pendingPayments}
+                  </h3>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+       
       </div>
-    </section>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.5 }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Spending History</CardTitle>
+              <CardDescription>Monthly spending overview</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={userDashboard?.data?.userStats.spending.monthly}>
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="amount"
+                      stroke="#2563eb"
+                      strokeWidth={2}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.6 }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Spending Breakdown</CardTitle>
+              <CardDescription>Cost distribution by type</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={spendingData}
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {spendingData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="flex justify-center space-x-4">
+                  {spendingData.map((entry, index) => (
+                    <div key={entry.name} className="flex items-center">
+                      <div
+                        className="w-3 h-3 rounded-full mr-2"
+                        style={{
+                          backgroundColor: COLORS[index % COLORS.length],
+                        }}
+                      />
+                      <span className="text-sm">{entry.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.5 }}
+        ><Card>
+        <CardHeader>
+          <CardTitle>Spending Pattern</CardTitle>
+          <CardDescription>Cost breakdown and trends</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={userDashboard?.data?.userStats.spending.monthly}>
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="amount" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card></motion.div>
+
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.5 }}
+        ><Card>
+        <CardHeader>
+          <CardTitle>Feature Usage Analysis</CardTitle>
+          <CardDescription>Additional features utilization</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <RadarChart data={Object.entries(featureUsage).map(([feature, count]) => ({
+                feature,
+                count
+              }))}>
+                <PolarGrid />
+                <PolarAngleAxis dataKey="feature" />
+                <PolarRadiusAxis />
+                <Radar
+                  name="Features"
+                  dataKey="count"
+                  stroke="#8884d8"
+                  fill="#8884d8"
+                  fillOpacity={0.6}
+                />
+                <Tooltip />
+              </RadarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card></motion.div>
+
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.5 }}
+        ><Card>
+        <CardHeader>
+          <CardTitle>Booking Timeline</CardTitle>
+          <CardDescription>Historical booking activity</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={userDashboard?.data?.bookingStats.timeline}>
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Line 
+                  type="monotone" 
+                  dataKey="count" 
+                  stroke="#82ca9d" 
+                  strokeWidth={2}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card></motion.div>
+
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.5 }}
+        > <Card>
+        <CardHeader>
+          <CardTitle>Rental Cost Analysis</CardTitle>
+          <CardDescription>Cost comparison across rentals</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={rentalHistory}>
+                <XAxis dataKey="car" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="cost" name="Rental Cost" fill="#8884d8" />
+                <Bar dataKey="features" name="Features Added" fill="#82ca9d" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card></motion.div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.7 }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Active Rentals</CardTitle>
+              <CardDescription>Currently rented vehicles</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {userDashboard?.data?.userStats.activeRentals.map((rental: any) => (
+                  <div
+                    key={rental.id}
+                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                  >
+                    <div>
+                      <h4 className="font-medium">{rental.car}</h4>
+                      <p className="text-sm text-gray-500">
+                        Return by: {rental.returnDate}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">${rental.cost}</p>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          rental.paymentStatus === "Paid"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {rental.paymentStatus}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.8 }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Upcoming Bookings</CardTitle>
+              <CardDescription>Your scheduled rentals</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {userDashboard?.data?.userStats.upcomingBookings.map((booking: any) => (
+                  <div
+                    key={booking.id}
+                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                  >
+                    <div>
+                      <h4 className="font-medium">{booking.car}</h4>
+                      <p className="text-sm text-gray-500">
+                        Start: {booking.startDate}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">${booking.cost}</p>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          booking.paymentStatus === "Paid"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {booking.paymentStatus}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    </div>
   );
 };
 

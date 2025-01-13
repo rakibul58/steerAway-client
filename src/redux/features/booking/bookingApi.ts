@@ -9,7 +9,7 @@ const bookingApi = baseApi.injectEndpoints({
         method: "POST",
         body: bookingDetails,
       }),
-      invalidatesTags: ["cars"],
+      invalidatesTags: ["cars", "dashboard"],
     }),
 
     getMyBookings: builder.query({
@@ -56,21 +56,21 @@ const bookingApi = baseApi.injectEndpoints({
         method: "PUT",
         body: payload.data,
       }),
-      invalidatesTags: ["bookings", "cars"],
+      invalidatesTags: ["bookings", "cars", "dashboard"],
     }),
     cancelBooking: builder.mutation({
       query: (id) => ({
         url: `/bookings/my-bookings/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["bookings"],
+      invalidatesTags: ["bookings", "dashboard"],
     }),
     payment: builder.mutation({
       query: (id) => ({
         url: `/bookings/payment/${id}`,
         method: "POST",
       }),
-      invalidatesTags: ["bookings"],
+      invalidatesTags: ["bookings", 'dashboard'],
     }),
   }),
 });
