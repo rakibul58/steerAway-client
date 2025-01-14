@@ -1,359 +1,590 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { AlertCircle, Upload, X } from "lucide-react";
+import { ICarForm } from "@/Types";
 import { toast } from "sonner";
-import { CarTypes } from "@/Constants/Car";
 import {
   useGetSingleCarQuery,
   useUpdateCarMutation,
 } from "@/redux/features/cars/carApi";
 
-interface ICarForm {
-  name: string;
-  year: string;
-  description: string;
-  color: string;
-  isElectric: boolean;
-  features: string[];
-  pricePerHour: number;
-  carType: string;
-  image?: string;
-  insurancePrice?: number;
-  childSeatPrice?: number;
-  gpsPrice?: number;
-}
-
 const EditCars = () => {
   const { id } = useParams();
-  const { data, isFetching, isLoading } = useGetSingleCarQuery(id as string);
-  const [imageUpload, setImageUpload] = useState<File | null>(null);
+  const { data: carData, isLoading } = useGetSingleCarQuery(id as string);
   const [updateCar] = useUpdateCarMutation();
-
-  useEffect(() => {
-    if (isFetching || isLoading) {
-      toast.loading("Fetching Car Details", { duration: 3000 });
-    } else {
-      toast.dismiss();
-      setValue("name", data.data.name);
-      setValue("year", data.data.year);
-      setValue("description", data.data.description);
-      setValue("color", data.data.color);
-      setValue("isElectric", data.data.isElectric.toString());
-      setValue("features", data.data.features.join(", "));
-      setValue("pricePerHour", data.data.pricePerHour);
-      setValue("carType", data.data.carType);
-      setValue("insurancePrice", data.data.insurancePrice);
-      setValue("childSeatPrice", data.data.childSeatPrice);
-      setValue("gpsPrice", data.data.gpsPrice);
-      toast.success("Car Details Fetched Successfully", { duration: 1000 });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFetching, isLoading, data]);
+  const [imageUploads, setImageUploads] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
-    setValue,
+    watch,
     formState: { errors },
-  } = useForm<ICarForm>();
-  const navigate = useNavigate();
+    setValue,
+    reset,
+  } = useForm<ICarForm>({
+    defaultValues: {
+      features: [""],
+    },
+  });
 
-  const handleImageUpload = async (): Promise<string | null> => {
-    if (!imageUpload) return data?.data?.image;
-    const formData = new FormData();
-    formData.append("file", imageUpload);
-    formData.append(
-      "upload_preset",
-      `${import.meta.env.VITE_CLOUDINARY_PRESET}`
-    );
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_CLOUDINARY_URI}`,
-        formData
-      );
-      return response.data.secure_url;
-    } catch (error: any) {
-      toast.error(error.message || "Failed Upload Image....", {
-        duration: 3000,
+  useEffect(() => {
+    if (carData) {
+      reset({
+        name: carData?.data?.name,
+        brand: carData?.data?.brand,
+        model: carData?.data?.model,
+        year: carData?.data?.year,
+        color: carData?.data?.color,
+        isElectric: carData?.data?.isElectric,
+        description: carData?.data?.description,
+        features: carData?.data?.features,
+        specifications: carData?.data?.specifications,
+        pricing: carData?.data?.pricing,
+        status: carData?.data?.status,
       });
-      return null;
+      setExistingImages(carData?.data?.images || []);
     }
+  }, [carData, reset]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      const validFiles = files.filter((file) => {
+        const isValid = file.size <= 5 * 1024 * 1024; // 5MB limit
+        if (!isValid) {
+          toast.error(`${file.name} is too large. Max size is 5MB`);
+        }
+        return isValid;
+      });
+      setImageUploads((prev) => [...prev, ...validFiles]);
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setImageUploads((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingImage = (index: number) => {
+    setExistingImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleImagesUpload = async (): Promise<string[]> => {
+    if (!imageUploads.length) return existingImages;
+
+    try {
+      const uploadPromises = imageUploads.map(async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append(
+          "upload_preset",
+          import.meta.env.VITE_CLOUDINARY_PRESET
+        );
+
+        const response = await axios.post(
+          import.meta.env.VITE_CLOUDINARY_URI,
+          formData
+        );
+        return response.data.secure_url;
+      });
+
+      const newImageUrls = await Promise.all(uploadPromises);
+      return [...existingImages, ...newImageUrls];
+    } catch (error: any) {
+      toast.error("Failed to upload images");
+      return existingImages;
+    }
+  };
+
+  const features = watch("features") || [""];
+
+  const addFeatureField = () => {
+    const currentFeatures = features;
+    setValue("features", [...currentFeatures, ""]);
+  };
+
+  const removeFeatureField = (index: number) => {
+    const currentFeatures = features.filter((_, i) => i !== index);
+    setValue("features", currentFeatures);
   };
 
   const onSubmit: SubmitHandler<ICarForm> = async (data) => {
-    const toastId = toast.loading("Updating Car....", { duration: 3000 });
-    const imageUrl = await handleImageUpload();
-    const carData = {
-      ...data,
-      image: imageUrl,
-      isElectric: data?.isElectric == true,
-    };
+    if (!id) return;
+
     try {
-      const res = await updateCar({ id: id, carData }).unwrap();
-      toast.success(res.message, { id: toastId, duration: 2000 });
+      setUploading(true);
+      const toastId = toast.loading("Updating Car...");
+      const imageUrls = await handleImagesUpload();
+
+      const carData = {
+        ...data,
+        images: imageUrls,
+        isElectric: Boolean(data.isElectric),
+        features: features.filter((f) => f.trim() !== ""),
+        specifications: {
+          ...data.specifications,
+          seatingCapacity: Number(data.specifications.seatingCapacity),
+          mileage: Number(data.specifications.mileage),
+        },
+        pricing: {
+          ...data.pricing,
+          insurancePrice: Number(data.pricing.insurancePrice),
+          childSeatPrice: Number(data.pricing.childSeatPrice),
+          gpsPrice: Number(data.pricing.gpsPrice),
+          basePrice: Number(data.pricing.basePrice),
+          hourlyRate: Number(data.pricing.hourlyRate),
+          dailyRate: Number(data.pricing.dailyRate),
+          weeklyRate: Number(data.pricing.weeklyRate),
+          monthlyRate: Number(data.pricing.monthlyRate),
+        },
+      };
+
+      const res = await updateCar({ id, carData }).unwrap();
+      toast.success(res.message, { id: toastId });
       navigate("/admin/manage-car");
     } catch (err: any) {
-      toast.error(err.data.message || "Something went wrong", {
-        id: toastId,
-        duration: 2000,
-      });
+      console.log(err.data);
+      toast.error(err.data?.message || "Something went wrong");
+    } finally {
+      toast.dismiss();
+      setUploading(false);
     }
   };
 
-  return (
-    <section className="">
-      <div className="px-6">
-        <h1 className="text-3xl font-bold mb-8">Edit Car</h1>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div>
-            <label htmlFor="name" className="block mb-2 font-medium">
-              Car Name/Model
-            </label>
-            <input
-              id="name"
-              {...register("name", { required: "Car name is required" })}
-              placeholder="Enter car name or model"
-              className="py-3 px-4 w-full rounded-sm bg-secondary shadow-md"
-            />
-            {errors.name && (
-              <span className="text-destructive">{errors.name.message}</span>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="year" className="block mb-2 font-medium">
-                Year
-              </label>
-              <input
-                id="year"
-                {...register("year", { required: "Year is required" })}
-                placeholder="Enter year"
-                className="py-3 px-4 w-full rounded-sm bg-secondary shadow-md"
-              />
-              {errors.year && (
-                <span className="text-destructive">{errors.year.message}</span>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="color" className="block mb-2 font-medium">
-                Color
-              </label>
-              <input
-                id="color"
-                {...register("color", { required: "Color is required" })}
-                placeholder="Enter color"
-                className="py-3 px-4 w-full rounded-sm bg-secondary shadow-md"
-              />
-              {errors.color && (
-                <span className="text-destructive">{errors.color.message}</span>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="description" className="block mb-2 font-medium">
-              Description
-            </label>
-            <textarea
-              id="description"
-              {...register("description", {
-                required: "Description is required",
-              })}
-              placeholder="Enter car description"
-              className="py-3 px-4 w-full rounded-sm bg-secondary shadow-md"
-            />
-            {errors.description && (
-              <span className="text-destructive">
-                {errors.description.message}
-              </span>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="isElectric" className="block mb-2 font-medium">
-                Is Electric?
-              </label>
-              <select
-                id="isElectric"
-                {...register("isElectric", {
-                  required: "Please select if the car is electric",
-                })}
-                className="py-3 px-4 w-full rounded-sm bg-secondary shadow-md"
-              >
-                <option value={"true"}>Yes</option>
-                <option value={"false"}>No</option>
-              </select>
-              {errors.isElectric && (
-                <span className="text-destructive">
-                  {errors.isElectric.message}
-                </span>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="carType" className="block mb-2 font-medium">
-                Car Type
-              </label>
-              <select
-                id="carType"
-                {...register("carType", {
-                  required: "Please select a car type",
-                })}
-                className="py-3 px-4 w-full rounded-sm bg-secondary shadow-md"
-              >
-                <option value="">Select Car Type</option>
-                {CarTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-              {errors.carType && (
-                <span className="text-destructive">
-                  {errors.carType.message}
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="features" className="block mb-2 font-medium">
-              Features (comma-separated)
-            </label>
-            <input
-              id="features"
-              {...register("features", {
-                required: "Features are required",
-                setValueAs: (v) => v.split(",").map((f: any) => f.trim()),
-              })}
-              placeholder="Enter features"
-              className="py-3 px-4 w-full rounded-sm bg-secondary shadow-md"
-            />
-            {errors.features && (
-              <span className="text-destructive">
-                {errors.features.message}
-              </span>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="pricePerHour" className="block mb-2 font-medium">
-                Price Per Hour
-              </label>
-              <input
-                type="number"
-                id="pricePerHour"
-                {...register("pricePerHour", {
-                  required: "Price per hour is required",
-                  valueAsNumber: true,
-                })}
-                placeholder="Enter price per hour"
-                className="py-3 px-4 w-full rounded-sm bg-secondary shadow-md"
-              />
-              {errors.pricePerHour && (
-                <span className="text-destructive">
-                  {errors.pricePerHour.message}
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label
-                htmlFor="insurancePrice"
-                className="block mb-2 font-medium"
-              >
-                Insurance Price
-              </label>
-              <input
-                id="insurancePrice"
-                {...register("insurancePrice", {
-                  required: "Insurance price is required",
-                  valueAsNumber: true,
-                })}
-                placeholder="Enter insurance price"
-                className="py-3 px-4 w-full rounded-sm bg-secondary shadow-md"
-              />
-              {errors.insurancePrice && (
-                <span className="text-destructive">
-                  {errors.insurancePrice.message}
-                </span>
-              )}
-            </div>
-
-            <div>
-              <label
-                htmlFor="childSeatPrice"
-                className="block mb-2 font-medium"
-              >
-                Child Seat Price
-              </label>
-              <input
-                id="childSeatPrice"
-                type="number"
-                {...register("childSeatPrice", {
-                  required: "Child Seat Price is required",
-                  valueAsNumber: true,
-                })}
-                placeholder="Enter child seat price"
-                className="py-3 px-4 w-full rounded-sm bg-secondary shadow-md"
-              />
-              {errors.childSeatPrice && (
-                <span className="text-destructive">
-                  {errors.childSeatPrice.message}
-                </span>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="gpsPrice" className="block mb-2 font-medium">
-                GPS Price
-              </label>
-              <input
-                id="gpsPrice"
-                type="number"
-                {...register("gpsPrice", {
-                  required: "Gps Price is required",
-                  valueAsNumber: true,
-                })}
-                placeholder="Enter GPS price"
-                className="py-3 px-4 w-full rounded-sm bg-secondary shadow-md"
-              />
-              {errors.gpsPrice && (
-                <span className="text-destructive">
-                  {errors.gpsPrice.message}
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="image" className="block mb-2 font-medium">
-              Car Image
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              id="image"
-              onChange={(e) => setImageUpload(e.target.files?.[0] || null)}
-              className="py-3 px-4 w-full rounded-sm bg-secondary shadow-md"
-            />
-          </div>
-          <Button type="submit" size="lg" className="w-full">
-            Update Car
-          </Button>
-        </form>
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
-    </section>
+    );
+  }
+
+  return (
+    <div className="mx-auto px-4">
+      <Card className="w-full mx-auto">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Update Car</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Basic Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Car Name</Label>
+                <Input
+                  id="name"
+                  {...register("name")}
+                  className={errors.name ? "border-red-500" : ""}
+                />
+                {errors.name && (
+                  <p className="text-sm text-red-500 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.name.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="brand">Brand</Label>
+                <Input
+                  id="brand"
+                  {...register("brand")}
+                  className={errors.brand ? "border-red-500" : ""}
+                />
+                {errors.brand && (
+                  <p className="text-sm text-red-500">{errors.brand.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="model">Model</Label>
+                <Input
+                  id="model"
+                  {...register("model")}
+                  className={errors.model ? "border-red-500" : ""}
+                />
+                {errors.model && (
+                  <p className="text-sm text-red-500">{errors.model.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="year">Year</Label>
+                <Input
+                  id="year"
+                  type="number"
+                  {...register("year")}
+                  className={errors.year ? "border-red-500" : ""}
+                />
+                {errors.year && (
+                  <p className="text-sm text-red-500">{errors.year.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="color">Color</Label>
+                <Input
+                  id="color"
+                  {...register("color")}
+                  className={errors.color ? "border-red-500" : ""}
+                />
+                {errors.color && (
+                  <p className="text-sm text-red-500">{errors.color.message}</p>
+                )}
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="isElectric"
+                  {...register("isElectric")}
+                  checked={carData?.data?.isElectric}
+                />
+                <Label htmlFor="isElectric">Electric Vehicle</Label>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                {...register("description")}
+                className={`h-32 ${errors.description ? "border-red-500" : ""}`}
+              />
+              {errors.description && (
+                <p className="text-sm text-red-500">
+                  {errors.description.message}
+                </p>
+              )}
+            </div>
+
+            {/* Specifications */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Specifications</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="transmission">Transmission</Label>
+                  <Select
+                    onValueChange={(value) =>
+                      setValue(
+                        "specifications.transmission",
+                        value as "automatic" | "manual"
+                      )
+                    }
+                    value={carData?.data?.specifications.transmission}
+                    defaultValue={watch("specifications.transmission")}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select transmission" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="automatic">Automatic</SelectItem>
+                      <SelectItem value="manual">Manual</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="fuelType">Fuel Type</Label>
+                  <Select
+                    onValueChange={(value) =>
+                      setValue(
+                        "specifications.fuelType",
+                        value as "petrol" | "diesel" | "electric" | "hybrid"
+                      )
+                    }
+                    value={carData?.data?.specifications.fuelType}
+                    defaultValue={watch("specifications.fuelType")}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select fuel type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="petrol">Petrol</SelectItem>
+                      <SelectItem value="diesel">Diesel</SelectItem>
+                      <SelectItem value="electric">Electric</SelectItem>
+                      <SelectItem value="hybrid">Hybrid</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="seatingCapacity">Seating Capacity</Label>
+                  <Input
+                    id="seatingCapacity"
+                    type="number"
+                    {...register("specifications.seatingCapacity")}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="mileage">Mileage</Label>
+                  <Input
+                    id="mileage"
+                    type="number"
+                    {...register("specifications.mileage")}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Pricing */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Pricing</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="basePrice">Base Price</Label>
+                  <Input
+                    id="basePrice"
+                    type="number"
+                    {...register("pricing.basePrice")}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="hourlyRate">Hourly Rate</Label>
+                  <Input
+                    id="hourlyRate"
+                    type="number"
+                    {...register("pricing.hourlyRate")}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="dailyRate">Daily Rate</Label>
+                  <Input
+                    id="dailyRate"
+                    type="number"
+                    {...register("pricing.dailyRate")}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="weeklyRate">Weekly Rate</Label>
+                  <Input
+                    id="weeklyRate"
+                    type="number"
+                    {...register("pricing.weeklyRate")}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="monthlyRate">Monthly Rate</Label>
+                  <Input
+                    id="monthlyRate"
+                    type="number"
+                    {...register("pricing.monthlyRate")}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Features */}
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Features</h3>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={addFeatureField}
+                >
+                  Add Feature
+                </Button>
+              </div>
+              <div className="space-y-2">
+                {features.map((_, index) => (
+                  <div key={index} className="flex gap-2">
+                    <Input
+                      {...register(`features.${index}`)}
+                      placeholder={`Feature ${index + 1}`}
+                    />
+                    {features.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => removeFeatureField(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {existingImages.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Existing Images</h3>
+                <div className="flex flex-wrap gap-4">
+                  {existingImages.map((url, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={url}
+                        alt={`Car ${index + 1}`}
+                        className="size-32 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeExistingImage(index)}
+                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* New Image Upload */}
+            <div className="space-y-4">
+              <Label>Upload New Images</Label>
+              <div className="flex items-center justify-center w-full">
+                <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <Upload className="w-8 h-8 mb-4 text-gray-500" />
+                    <p className="mb-2 text-sm text-gray-500">
+                      <span className="font-semibold">Click to upload</span> or
+                      drag and drop
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      PNG, JPG, JPEG (MAX. 5MB each)
+                    </p>
+                  </div>
+                  <input
+                    type="file"
+                    className="hidden"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                </label>
+              </div>
+              {imageUploads.length > 0 && (
+                <div className="flex flex-wrap gap-4 mt-4">
+                  {imageUploads.map((file, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`Preview ${index}`}
+                        className="size-32 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Additional Services */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Additional Services</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="insurancePrice">Insurance Price</Label>
+                  <Input
+                    id="insurancePrice"
+                    type="number"
+                    {...register("pricing.insurancePrice")}
+                    placeholder="50"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="childSeatPrice">Child Seat Price</Label>
+                  <Input
+                    id="childSeatPrice"
+                    type="number"
+                    {...register("pricing.childSeatPrice")}
+                    placeholder="50"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="gpsPrice">GPS Price</Label>
+                  <Input
+                    id="gpsPrice"
+                    type="number"
+                    {...register("pricing.gpsPrice")}
+                    placeholder="50"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Status */}
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select
+                onValueChange={(value) =>
+                  setValue(
+                    "status",
+                    value as "available" | "reserved" | "booked"
+                  )
+                }
+                value={carData?.data?.status}
+                defaultValue={watch("status")}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="available">Available</SelectItem>
+                  <SelectItem value="reserved">Reserved</SelectItem>
+                  <SelectItem value="booked">Booked</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex gap-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => navigate("/admin/manage-car")}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" className="w-full" disabled={uploading}>
+                {uploading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Updating...
+                  </div>
+                ) : (
+                  "Update Car"
+                )}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
