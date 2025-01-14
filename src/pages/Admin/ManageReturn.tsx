@@ -39,6 +39,11 @@ const ManageReturn = () => {
 
   const handleReturn = async () => {
     const toastId = toast.loading("Processing return...", { duration: 3000 });
+    console.log({
+      bookingId: selectedBookingId,
+      endTime,
+      endDate,
+    });
     try {
       const res = await returnCar({
         bookingId: selectedBookingId,
@@ -48,6 +53,7 @@ const ManageReturn = () => {
       toast.success(res.message, { id: toastId, duration: 2000 });
       closeModal();
     } catch (err: any) {
+      console.log({ err });
       toast.error(err.data.message || "Something went wrong", {
         id: toastId,
         duration: 2000,
@@ -89,13 +95,27 @@ const ManageReturn = () => {
             <table className="w-full table-auto text-left">
               <thead className="bg-gray-200">
                 <tr>
-                  <th className="px-6 py-3 text-sm font-medium text-gray-600">Vehicle Details</th>
-                  <th className="px-6 py-3 text-sm font-medium text-gray-600">Customer Details</th>
-                  <th className="px-6 py-3 text-sm font-medium text-gray-600">Booking Period</th>
-                  <th className="px-6 py-3 text-sm font-medium text-gray-600">Costs</th>
-                  <th className="px-6 py-3 text-sm font-medium text-gray-600">Status</th>
-                  <th className="px-6 py-3 text-sm font-medium text-gray-600">Payment Info</th>
-                  <th className="px-6 py-3 text-sm font-medium text-gray-600">Actions</th>
+                  <th className="px-6 py-3 text-sm font-medium text-gray-600">
+                    Vehicle Details
+                  </th>
+                  <th className="px-6 py-3 text-sm font-medium text-gray-600">
+                    Customer Details
+                  </th>
+                  <th className="px-6 py-3 text-sm font-medium text-gray-600">
+                    Booking Period
+                  </th>
+                  <th className="px-6 py-3 text-sm font-medium text-gray-600">
+                    Costs
+                  </th>
+                  <th className="px-6 py-3 text-sm font-medium text-gray-600">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-sm font-medium text-gray-600">
+                    Payment Info
+                  </th>
+                  <th className="px-6 py-3 text-sm font-medium text-gray-600">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -105,9 +125,12 @@ const ManageReturn = () => {
                       <td className="px-6 py-4">
                         <div className="space-y-1">
                           <p className="font-medium">{booking.car.name}</p>
-                          <p className="text-sm text-gray-600">{booking.car.brand} {booking.car.model}</p>
                           <p className="text-sm text-gray-600">
-                            {booking.car.specifications.transmission} | {booking.car.specifications.fuelType}
+                            {booking.car.brand} {booking.car.model}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {booking.car.specifications.transmission} |{" "}
+                            {booking.car.specifications.fuelType}
                           </p>
                           <p className="text-sm text-gray-600">
                             {booking.car.specifications.seatingCapacity} seats
@@ -117,28 +140,46 @@ const ManageReturn = () => {
                       <td className="px-6 py-4">
                         <div className="space-y-1">
                           <p className="font-medium">{booking.user.name}</p>
-                          <p className="text-sm text-gray-600">{booking.user.email}</p>
-                          <p className="text-sm text-gray-600">{booking.user.phone}</p>
-                          <p className="text-xs text-gray-500">License: {booking.drivingLicense}</p>
+                          <p className="text-sm text-gray-600">
+                            {booking.user.email}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {booking.user.phone}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            License: {booking.drivingLicense}
+                          </p>
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="space-y-1">
                           <p className="text-sm">Date: {booking.date}</p>
                           <p className="text-sm">Start: {booking.startTime}</p>
-                          <p className="text-sm">End: {booking.endTime || "N/A"}</p>
-                          <p className="text-sm font-medium">Duration: {booking.duration}</p>
+                          <p className="text-sm">
+                            End: {booking.endTime || "N/A"}
+                          </p>
+                          <p className="text-sm font-medium">
+                            Duration: {booking.duration}
+                          </p>
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="space-y-1">
                           <p className="text-sm">Base: ${booking.baseCost}</p>
                           <div className="text-xs text-gray-600">
-                            <p>Insurance: ${booking.additionalCosts.insuranceCost}</p>
+                            <p>
+                              Insurance: $
+                              {booking.additionalCosts.insuranceCost}
+                            </p>
                             <p>GPS: ${booking.additionalCosts.gpsCost}</p>
-                            <p>Child Seat: ${booking.additionalCosts.childSeatCost}</p>
+                            <p>
+                              Child Seat: $
+                              {booking.additionalCosts.childSeatCost}
+                            </p>
                           </div>
-                          <p className="font-medium">Total: ${booking.totalCost}</p>
+                          <p className="font-medium">
+                            Total: ${booking.totalCost}
+                          </p>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -148,6 +189,8 @@ const ManageReturn = () => {
                               ? "bg-green-200 text-green-800"
                               : booking.status === "Returned"
                               ? "bg-blue-200 text-blue-800"
+                              : booking.status === "Cancelled"
+                              ? "bg-red-200 text-red-800"
                               : "bg-yellow-200 text-yellow-800"
                           }`}
                         >
@@ -165,12 +208,15 @@ const ManageReturn = () => {
                           >
                             {booking.paymentStatus}
                           </span>
-                          <p className="text-xs text-gray-600 mt-2">
-                            ID: {booking.transactionId}
-                          </p>
+                          {booking.paymentStatus === "Paid" && (
+                            <p className="text-xs text-gray-600 mt-2">
+                              ID: {booking.transactionId}
+                            </p>
+                          )}
                           {booking.paidAt && (
                             <p className="text-xs text-gray-600">
-                              Paid: {new Date(booking.paidAt).toLocaleDateString()}
+                              Paid:{" "}
+                              {new Date(booking.paidAt).toLocaleDateString()}
                             </p>
                           )}
                         </div>
@@ -213,7 +259,9 @@ const ManageReturn = () => {
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-md">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">Car Return Details</h3>
+            <h3 className="text-xl font-bold text-gray-800 mb-4">
+              Car Return Details
+            </h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -241,9 +289,7 @@ const ManageReturn = () => {
                 <Button variant="outline" onClick={closeModal}>
                   Cancel
                 </Button>
-                <Button onClick={handleReturn}>
-                  Confirm Return
-                </Button>
+                <Button onClick={handleReturn}>Confirm Return</Button>
               </div>
             </div>
           </div>

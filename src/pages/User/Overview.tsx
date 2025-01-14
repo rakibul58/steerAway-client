@@ -48,32 +48,55 @@ const Overview = () => {
     return <div className="text-red-500">Error: Failed to fetch</div>;
   }
 
+  const spendingData = Object.entries(
+    userDashboard?.data?.userStats.spending.byType
+  ).map(([key, value]) => ({
+    name: key.replace("Costs", ""),
+    value,
+  }));
+
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
-  const spendingData = Object.entries(userDashboard?.data?.userStats.spending.byType).map(
-    ([key, value]) => ({
-      name: key.replace("Costs", ""),
-      value,
-    })
-  );
+  // Feature Usage Analysis - Combine data from both active rentals and upcoming bookings
+  const allBookings = [
+    ...(userDashboard?.data?.userStats?.activeRentals || []),
+    ...(userDashboard?.data?.userStats?.upcomingBookings || []),
+  ];
+
+  const featureUsageData = allBookings.reduce((acc: any[], booking: any) => {
+    const features = booking.additionalFeatures || {};
+    // delete features._id;
+
+    Object.entries(features).forEach(([feature, used]) => {
+      const existingFeature = acc.find((item) => item.feature === feature);
+      if (existingFeature) {
+        existingFeature.count += used ? 1 : 0;
+      } else {
+        acc.push({
+          feature: feature.charAt(0).toUpperCase() + feature.slice(1), // Capitalize feature name
+          count: used ? 1 : 0,
+        });
+      }
+    });
+    return acc;
+  }, []);
+
+  // Rental Cost Analysis - Use spending by type data
+  const rentalCostData = Object.entries(
+    userDashboard?.data?.userStats?.spending?.byType || {}
+  )
+    .map(([key, value]) => ({
+      category:
+        key.replace("Costs", "").charAt(0).toUpperCase() +
+        key.replace("Costs", "").slice(1),
+      cost: value,
+    }))
+    .filter((item) => (item.cost as number) > 0); // Only show categories with costs
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   };
-
-  const featureUsage = userDashboard?.data?.userStats.activeRentals.reduce((acc: Record<string, number>, rental: any) => {
-    Object.entries(rental.additionalFeatures).forEach(([feature, used]) => {
-      if (used) acc[feature] = (acc[feature] || 0) + 1;
-    });
-    return acc;
-  }, {});
-
-  const rentalHistory = userDashboard?.data?.userStats.activeRentals.map((rental: any) => ({
-    car: rental.car,
-    cost: rental.cost,
-    features: Object.values(rental.additionalFeatures).filter(Boolean).length
-  }));
 
   return (
     <div className="px-4 min-h-screen">
@@ -172,8 +195,6 @@ const Overview = () => {
             </CardContent>
           </Card>
         </motion.div>
-
-       
       </div>
 
       {/* Charts Section */}
@@ -192,7 +213,9 @@ const Overview = () => {
             <CardContent>
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={userDashboard?.data?.userStats.spending.monthly}>
+                  <LineChart
+                    data={userDashboard?.data?.userStats.spending.monthly}
+                  >
                     <XAxis dataKey="month" />
                     <YAxis />
                     <Tooltip />
@@ -231,7 +254,7 @@ const Overview = () => {
                       paddingAngle={5}
                       dataKey="value"
                     >
-                      {spendingData.map((entry, index) => (
+                      {spendingData.map((_entry, index) => (
                         <Cell
                           key={`cell-${index}`}
                           fill={COLORS[index % COLORS.length]}
@@ -264,112 +287,133 @@ const Overview = () => {
           initial="hidden"
           animate="visible"
           transition={{ delay: 0.5 }}
-        ><Card>
-        <CardHeader>
-          <CardTitle>Spending Pattern</CardTitle>
-          <CardDescription>Cost breakdown and trends</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={userDashboard?.data?.userStats.spending.monthly}>
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="amount" fill="#8884d8" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card></motion.div>
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Spending Pattern</CardTitle>
+              <CardDescription>Cost breakdown and trends</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={userDashboard?.data?.userStats.spending.monthly}
+                  >
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="amount" fill="#8884d8" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.5 }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Feature Usage Analysis</CardTitle>
+              <CardDescription>
+                Additional features utilization across all bookings
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                {featureUsageData.length === 0 ? (
+                  <div className="flex items-center justify-center h-full text-gray-500">
+                    No feature usage data available
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadarChart data={featureUsageData}>
+                      <PolarGrid />
+                      <PolarAngleAxis dataKey="feature" />
+                      <PolarRadiusAxis />
+                      <Radar
+                        name="Usage Count"
+                        dataKey="count"
+                        stroke="#8884d8"
+                        fill="#8884d8"
+                        fillOpacity={0.6}
+                      />
+                      <Tooltip />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         <motion.div
           variants={cardVariants}
           initial="hidden"
           animate="visible"
           transition={{ delay: 0.5 }}
-        ><Card>
-        <CardHeader>
-          <CardTitle>Feature Usage Analysis</CardTitle>
-          <CardDescription>Additional features utilization</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <RadarChart data={Object.entries(featureUsage).map(([feature, count]) => ({
-                feature,
-                count
-              }))}>
-                <PolarGrid />
-                <PolarAngleAxis dataKey="feature" />
-                <PolarRadiusAxis />
-                <Radar
-                  name="Features"
-                  dataKey="count"
-                  stroke="#8884d8"
-                  fill="#8884d8"
-                  fillOpacity={0.6}
-                />
-                <Tooltip />
-              </RadarChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card></motion.div>
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Booking Timeline</CardTitle>
+              <CardDescription>Historical booking activity</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={userDashboard?.data?.bookingStats.timeline}>
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="count"
+                      stroke="#82ca9d"
+                      strokeWidth={2}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         <motion.div
           variants={cardVariants}
           initial="hidden"
           animate="visible"
           transition={{ delay: 0.5 }}
-        ><Card>
-        <CardHeader>
-          <CardTitle>Booking Timeline</CardTitle>
-          <CardDescription>Historical booking activity</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={userDashboard?.data?.bookingStats.timeline}>
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Line 
-                  type="monotone" 
-                  dataKey="count" 
-                  stroke="#82ca9d" 
-                  strokeWidth={2}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card></motion.div>
-
-        <motion.div
-          variants={cardVariants}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: 0.5 }}
-        > <Card>
-        <CardHeader>
-          <CardTitle>Rental Cost Analysis</CardTitle>
-          <CardDescription>Cost comparison across rentals</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={rentalHistory}>
-                <XAxis dataKey="car" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="cost" name="Rental Cost" fill="#8884d8" />
-                <Bar dataKey="features" name="Features Added" fill="#82ca9d" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card></motion.div>
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Cost Breakdown Analysis</CardTitle>
+              <CardDescription>
+                Distribution of costs by category
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                {rentalCostData.length === 0 ? (
+                  <div className="flex items-center justify-center h-full text-gray-500">
+                    No cost data available
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={rentalCostData}>
+                      <XAxis dataKey="category" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="cost" name="Cost" fill="#8884d8" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -386,31 +430,33 @@ const Overview = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {userDashboard?.data?.userStats.activeRentals.map((rental: any) => (
-                  <div
-                    key={rental.id}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                  >
-                    <div>
-                      <h4 className="font-medium">{rental.car}</h4>
-                      <p className="text-sm text-gray-500">
-                        Return by: {rental.returnDate}
-                      </p>
+                {userDashboard?.data?.userStats.activeRentals.map(
+                  (rental: any) => (
+                    <div
+                      key={rental.id}
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                    >
+                      <div>
+                        <h4 className="font-medium">{rental.car}</h4>
+                        <p className="text-sm text-gray-500">
+                          Return by: {rental.returnDate}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">${rental.cost}</p>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs ${
+                            rental.paymentStatus === "Paid"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {rental.paymentStatus}
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium">${rental.cost}</p>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs ${
-                          rental.paymentStatus === "Paid"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {rental.paymentStatus}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  )
+                )}
               </div>
             </CardContent>
           </Card>
@@ -429,31 +475,33 @@ const Overview = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {userDashboard?.data?.userStats.upcomingBookings.map((booking: any) => (
-                  <div
-                    key={booking.id}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                  >
-                    <div>
-                      <h4 className="font-medium">{booking.car}</h4>
-                      <p className="text-sm text-gray-500">
-                        Start: {booking.startDate}
-                      </p>
+                {userDashboard?.data?.userStats.upcomingBookings.map(
+                  (booking: any) => (
+                    <div
+                      key={booking.id}
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                    >
+                      <div>
+                        <h4 className="font-medium">{booking.car}</h4>
+                        <p className="text-sm text-gray-500">
+                          Start: {booking.startDate}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">${booking.cost}</p>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs ${
+                            booking.paymentStatus === "Paid"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}
+                        >
+                          {booking.paymentStatus}
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium">${booking.cost}</p>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs ${
-                          booking.paymentStatus === "Paid"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
-                      >
-                        {booking.paymentStatus}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  )
+                )}
               </div>
             </CardContent>
           </Card>

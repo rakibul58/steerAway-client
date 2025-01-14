@@ -9,7 +9,7 @@ const bookingApi = baseApi.injectEndpoints({
         method: "POST",
         body: bookingDetails,
       }),
-      invalidatesTags: ["cars", "dashboard"],
+      invalidatesTags: ["cars", "dashboard", "bookings"],
     }),
 
     getMyBookings: builder.query({

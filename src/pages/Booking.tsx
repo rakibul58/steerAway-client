@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useGetSingleCarQuery } from "@/redux/features/cars/carApi";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { StarIcon, CheckIcon } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -43,6 +43,7 @@ const Booking = () => {
       },
     },
   });
+  const navigate = useNavigate();
 
   const calculateBaseCost = (duration: string) => {
     const basePrice = carData?.data?.pricing?.basePrice || 0;
@@ -84,6 +85,7 @@ const Booking = () => {
     try {
       const res = await bookCar(bookingData).unwrap();
       toast.success(res.message, { id: toastId, duration: 2000 });
+      navigate('/user/overview')
     } catch (err: any) {
       console.log({err});
       toast.error(err.data.message || "Something went wrong", {
