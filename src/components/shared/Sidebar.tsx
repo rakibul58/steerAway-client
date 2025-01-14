@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
-import { Menu, Car, LogOut, User, ChevronRight } from "lucide-react";
+import { Menu, Car, LogOut, ChevronRight, Home } from "lucide-react";
 import {
   logout,
   TUser,
@@ -176,8 +175,8 @@ const Sidebar = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuItem className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  <span>Profile</span>
+                  <Home className="h-4 w-4" />
+                  <Link to={'/'}>Home</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem

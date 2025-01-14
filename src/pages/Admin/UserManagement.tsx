@@ -9,7 +9,7 @@ import {
 } from "@/redux/features/auth/authApi";
 
 const UserManagement = () => {
-  const { data: users, isLoading, isFetching } = useGetAllUsersQuery([]);
+  const { data: users, isLoading, isFetching } = useGetAllUsersQuery(undefined);
   const [updateUser] = useUpdateUsersMutation();
 
   const handleDelete = async (userId: string) => {
@@ -20,7 +20,6 @@ const UserManagement = () => {
         data: { isDeleted: true },
       }).unwrap();
       toast.success(res.message, { id: toastId, duration: 2000 });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(err.data.message || "Something went wrong", {
         id: toastId,
@@ -39,57 +38,106 @@ const UserManagement = () => {
   }, [isFetching, isLoading]);
 
   return (
-    <div className="px-6">
-      <h1 className="text-2xl font-bold mb-8">Manage Users</h1>
-      <div className="flex justify-end mb-4">
-        <Link to="/admin/add-user">
-          <Button>Add New User</Button>
-        </Link>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full shadow-lg border rounded-md">
-          <thead className="bg-secondary">
-            <tr>
-              <th className="px-4 py-2 text-left">Name</th>
-              <th className="px-4 py-2 text-left">Email</th>
-              <th className="px-4 py-2 text-left">Deleted</th>
-              <th className="px-4 py-2 text-left">Role</th>
-              <th className="px-4 py-2 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users?.data?.length > 0 ? (
-              users?.data?.map((user: any) => (
-                <tr key={user._id} className="border-b">
-                  <td className="px-4 py-2">{user.name}</td>
-                  <td className="px-4 py-2">{user.email}</td>
-                  <td className="px-4 py-2">{user.isDeleted == true ? "Deleted" : "Active" }</td>
-                  <td className="px-4 py-2">{user.role}</td>
-                  <td className="px-4 py-2 space-x-2">
-                    <Link to={`/admin/edit-user/${user._id}`}>
-                      <Button size="sm">Edit</Button>
-                    </Link>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => handleDelete(user._id)}
-                    >
-                      Delete
-                    </Button>
-                  </td>
+    <section className="min-h-screen">
+      <div className="px-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-6">
+          <h1 className="text-4xl font-bold text-gray-800 mb-4 lg:mb-0">
+            Manage Users
+          </h1>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Link to="/admin/add-user">
+              <Button className="w-full sm:w-auto">Add New User</Button>
+            </Link>
+          </div>
+        </div>
+
+        <div className="w-full">
+          <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
+            <table className="w-full table-auto text-left">
+              <thead className="bg-gray-200">
+                <tr>
+                  <th className="px-6 py-3 text-sm font-medium text-gray-600">User Details</th>
+                  <th className="px-6 py-3 text-sm font-medium text-gray-600">Contact</th>
+                  <th className="px-6 py-3 text-sm font-medium text-gray-600">Status</th>
+                  <th className="px-6 py-3 text-sm font-medium text-gray-600">Role</th>
+                  <th className="px-6 py-3 text-sm font-medium text-gray-600">Actions</th>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={4} className="px-4 py-2 text-center">
-                  No users available.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              </thead>
+              <tbody>
+                {users?.data?.length > 0 ? (
+                  users.data.map((user: any) => (
+                    <tr key={user._id} className="border-b">
+                      <td className="px-6 py-4">
+                        <div className="space-y-1">
+                          <p className="font-medium">{user.name}</p>
+                          <p className="text-sm text-gray-600">ID: {user._id}</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="space-y-1">
+                          <p className="text-sm">{user.email}</p>
+                          <p className="text-sm text-gray-600">
+                            {user.phone || "No phone number"}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`px-3 py-1 text-xs rounded-full ${
+                            user.isDeleted
+                              ? "bg-red-200 text-red-800"
+                              : "bg-green-200 text-green-800"
+                          }`}
+                        >
+                          {user.isDeleted ? "Deleted" : "Active"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`px-3 py-1 text-xs rounded-full ${
+                            user.role === "admin"
+                              ? "bg-purple-200 text-purple-800"
+                              : "bg-blue-200 text-blue-800"
+                          }`}
+                        >
+                          {user.role}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex space-x-2">
+                          <Link to={`/admin/edit-user/${user._id}`}>
+                            <Button 
+                              size="sm"
+                            >
+                              Edit
+                            </Button>
+                          </Link>
+                          {!user.isDeleted && (
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleDelete(user._id)}
+                            >
+                              Delete
+                            </Button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                      No users available.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 

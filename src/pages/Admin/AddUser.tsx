@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   useGetSingleUsersQuery,
   useSignUpMutation,
@@ -29,8 +32,6 @@ const UserForm = () => {
   const [updateUsers] = useUpdateUsersMutation();
   const { data: user } = useGetSingleUsersQuery(id);
 
-  console.log({ user });
-
   // Pre-fill the form when editing a user
   if (user && id) {
     setValue("name", user.data.name);
@@ -49,7 +50,6 @@ const UserForm = () => {
         toast.success(res.message, { id: toastId, duration: 2000 });
       }
       navigate("/admin/user-management");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(err.data.message || "Something went wrong", {
         id: toastId,
@@ -59,85 +59,101 @@ const UserForm = () => {
   };
 
   return (
-    <div className="px-6">
-      <h1 className="text-2xl font-bold mb-8">
-        {id ? "Edit User" : "Add New User"}
-      </h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div>
-          <label htmlFor="name" className="block mb-1 font-medium">
-            Name
-          </label>
-          <Input
-            id="name"
-            defaultValue={user?.data?.name}
-            placeholder="Enter Name"
-            {...register("name", { required: "Name is required" })}
-            className="py-2 px-3 w-full border rounded-md"
-          />
-          {errors.name && <p className="text-red-500">{errors.name.message}</p>}
-        </div>
-        <div>
-          <label htmlFor="email" className="block mb-1 font-medium">
-            Email
-          </label>
-          <Input
-            id="email"
-            placeholder="Enter Email"
-            {...register("email", {
-              required: "Email is required",
-              pattern: {
-                value: /\S+@\S+\.\S+/,
-                message: "Invalid email address",
-              },
-            })}
-            className="py-2 px-3 w-full border rounded-md"
-          />
-          {errors.email && (
-            <p className="text-red-500">{errors.email.message}</p>
-          )}
-        </div>
-        {!id && (
-          <div>
-            <label htmlFor="password" className="block mb-1 font-medium">
-              Password
-            </label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Enter Password"
-              {...register("password", {
-                required: "Password is required",
-                minLength: {
-                  value: 6,
-                  message: "Password must be at least 6 characters",
-                },
-              })}
-              className="py-2 px-3 w-full border rounded-md"
-            />
-            {errors.password && (
-              <p className="text-red-500">{errors.password.message}</p>
-            )}
-          </div>
-        )}
-        <div>
-          <label htmlFor="role" className="block mb-1 font-medium">
-            Role
-          </label>
-          <select
-            id="role"
-            {...register("role", { required: "Role is required" })}
-            className="py-2 px-3 w-full border rounded-md bg-background"
-          >
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-          </select>
-          {errors.role && <p className="text-red-500">{errors.role.message}</p>}
-        </div>
-        <div>
-          <Button type="submit">{id ? "Update User" : "Add User"}</Button>
-        </div>
-      </form>
+    <div className="mx-auto px-4">
+      <Card className="mx-auto">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold">
+            {id ? "Edit User" : "Add New User"}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label htmlFor="name" className="text-sm font-medium">
+                  Name
+                </label>
+                <Input
+                  id="name"
+                  defaultValue={user?.data?.name}
+                  placeholder="Enter Name"
+                  {...register("name", { required: "Name is required" })}
+                  className="w-full"
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-sm">{errors.name.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-sm font-medium">
+                  Email
+                </label>
+                <Input
+                  id="email"
+                  placeholder="Enter Email"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /\S+@\S+\.\S+/,
+                      message: "Invalid email address",
+                    },
+                  })}
+                  className="w-full"
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-sm">{errors.email.message}</p>
+                )}
+              </div>
+              {!id && (
+                <div className="space-y-2">
+                  <label htmlFor="password" className="text-sm font-medium">
+                    Password
+                  </label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter Password"
+                    {...register("password", {
+                      required: "Password is required",
+                      minLength: {
+                        value: 6,
+                        message: "Password must be at least 6 characters",
+                      },
+                    })}
+                    className="w-full"
+                  />
+                  {errors.password && (
+                    <p className="text-red-500 text-sm">
+                      {errors.password.message}
+                    </p>
+                  )}
+                </div>
+              )}
+              <div className="space-y-2">
+                <label htmlFor="role" className="text-sm font-medium">
+                  Role
+                </label>
+                <select
+                  id="role"
+                  {...register("role", { required: "Role is required" })}
+                  className="w-full h-10 px-3 rounded-md border bg-background"
+                >
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
+                {errors.role && (
+                  <p className="text-red-500 text-sm">{errors.role.message}</p>
+                )}
+              </div>
+            </div>
+            <div className="flex justify-end pt-4">
+              <Button type="submit" className="w-full md:w-auto">
+                {id ? "Update User" : "Add User"}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };
