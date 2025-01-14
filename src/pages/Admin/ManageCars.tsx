@@ -9,39 +9,17 @@ import CarListings from "@/components/Admin/CarListings";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 
-export interface ICarForm {
-  _id: string;
-  name: string;
-  year: string;
-  description: string;
-  color: string;
-  isElectric: boolean;
-  features: string[];
-  pricePerHour: number;
-  carType?: string;
-  image?: string;
-  insurancePrice?: number;
-  childSeatPrice?: number;
-  gpsPrice?: number;
-  status?: string;
-}
-
 const ManageCars = () => {
   const [page, setPage] = useState<number>(1);
+  const [search, setSearch] = useState<string>("");
+
   const { data, isLoading, isFetching } = useGetAllCarsQuery([
-    {
-      name: "sort",
-      value: "-createdAt",
-    },
-    {
-      name: "page",
-      value: page,
-    },
-    {
-      name: "limit",
-      value: 5,
-    },
+    { name: "sort", value: "-createdAt" },
+    { name: "page", value: page },
+    { name: "limit", value: 5 },
+    { name: "searchTerm", value: search },
   ]);
+
   const [deleteCar] = useDeleteCarMutation();
 
   useEffect(() => {
@@ -57,10 +35,8 @@ const ManageCars = () => {
     const toastId = toast.loading("Deleting Car....", { duration: 3000 });
     try {
       const res = await deleteCar(id).unwrap();
-      console.log({res});
       toast.success(res.message, { id: toastId, duration: 2000 });
     } catch (err: any) {
-      console.log({err});
       toast.error(err.data.message || "Something went wrong", {
         id: toastId,
         duration: 2000,
@@ -69,13 +45,25 @@ const ManageCars = () => {
   };
 
   return (
-    <section className="">
-      <div className="px-6">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Manage Cars</h1>
-          <Link to={"/admin/add-car"}>
-            <Button>Add New Car</Button>
-          </Link>
+    <section className="min-h-screen">
+      <div className="px-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-6">
+          <h1 className="text-4xl font-bold text-gray-800 mb-4 lg:mb-0">
+            Manage Cars
+          </h1>
+          <div className="flex space-x-4">
+            <input
+              type="text"
+              placeholder="Search by name or brand"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm"
+            />
+
+            <Link to="/admin/add-car">
+              <Button>Add New Car</Button>
+            </Link>
+          </div>
         </div>
 
         <CarListings

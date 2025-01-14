@@ -1,5 +1,6 @@
 import Pagination from "@/components/shared/Pagination";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useGetAllBookingsQuery } from "@/redux/features/booking/bookingApi";
 import { useReturnCarMutation } from "@/redux/features/cars/carApi";
 import { useEffect, useState } from "react";
@@ -10,6 +11,7 @@ const ManageReturn = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState("");
   const [endTime, setEndTime] = useState("");
+  const [endDate, setEndDate] = useState("");
   const {
     data: bookings,
     isFetching,
@@ -29,7 +31,7 @@ const ManageReturn = () => {
     },
     {
       name: "limit",
-      value: 5,
+      value: 10,
     },
     {
       name: "page",
@@ -50,13 +52,22 @@ const ManageReturn = () => {
   const handleReturn = async () => {
     const toastId = toast.loading("Status updating....", { duration: 3000 });
     try {
+
+      console.log({
+        bookingId: selectedBookingId,
+        endTime,
+        endDate,
+      });
       const res = await returnCar({
         bookingId: selectedBookingId,
         endTime,
+        endDate,
       }).unwrap();
+  
       toast.success(res.message, { id: toastId, duration: 2000 });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
+      console.log({ err });
       toast.error(err.data.message || "Something went wrong", {
         id: toastId,
         duration: 2000,
@@ -72,6 +83,7 @@ const ManageReturn = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setEndTime("");
+    setEndDate("");
   };
 
   return (
@@ -180,11 +192,17 @@ const ManageReturn = () => {
           <div className="p-6 rounded-lg shadow-lg w-[90%] max-w-md bg-background">
             <h3 className="text-xl font-semibold mb-4">Enter End Time</h3>
             <p className="mb-4">Please enter the time the car was returned.</p>
-            <input
-              type="time"
+            <Input
+              type="date"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              className="mb-4 w-full bg-secondary p-2 rounded-md"
+              className="mb-4 bg-secondary p-2 rounded-md"
+            />
+            <Input
+              type="time"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="mb-4 bg-secondary p-2 rounded-md"
             />
             <div className="flex justify-end space-x-4">
               <Button variant="secondary" onClick={closeModal}>
